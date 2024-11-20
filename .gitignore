@@ -1,0 +1,23 @@
+# Arquivos de compilação
+*.o
+*.out
+*.exe
+*.d
+*.a
+*.so
+*.dll
+
+# Arquivos do editor (exemplo para VSCode)
+.vscode/
+
+# Arquivos temporários do sistema
+Thumbs.db
+.DS_Store
+
+# Diretórios de build
+/build/
+/bin/
+/obj/
+
+# Arquivos de log
+*.log
