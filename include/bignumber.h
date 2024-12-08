@@ -6,6 +6,7 @@ typedef struct BigNumber {
 	
 	int digito; //dado armazenado
 	struct BigNumber *next; //proximo no
+	struct BigNumber *prev; //no anterior
 
 } BigNumber;
 

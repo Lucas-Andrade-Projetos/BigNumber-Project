@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include "bignumber.h"
 
-//deixei os prints para conseguir visualizar mais fácil
 int main() {
     BigNumber* lista = NULL;
 
@@ -24,7 +23,7 @@ int main() {
     imprimirLista(lista);
 
     //Testando adicionar depois de um número
-    adicionarDepois(lista, 3, 7);
+    adicionarDepois(lista, 3, 7);  
     printf("Lista após adicionar 7 depois de 3: ");
     imprimirLista(lista);
 
@@ -37,7 +36,7 @@ int main() {
     }
 
     //Testando remover um número
-    removerNumero(&lista, 7);
+    removerNumero(&lista, 7); 
     printf("Lista após remover 7: ");
     imprimirLista(lista);
 
