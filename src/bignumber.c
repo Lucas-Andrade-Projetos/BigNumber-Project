@@ -24,15 +24,14 @@ void adicionarNoFim(BigNumber **head, int digito) {
     if (*head == NULL) {
         *head = novoNo;
         return;
-    }
-
-    BigNumber* temp = *head;
-    while (temp->next != NULL) {
+    }else{
+    	BigNumber* temp = *head;
+    	while (temp->next != NULL) {
         temp = temp->next;
-    }
-
-    temp->next = novoNo;
-	novoNo->prev = temp;//Define o anterior do novo nó
+    	}
+		temp->next = novoNo;
+		novoNo->prev = temp;//Define o anterior do novo nó
+	}
 }
 
 //Função para adicionar um nó no início da lista
@@ -41,145 +40,132 @@ void adicionarInicio(BigNumber** head, int valor) {
 	if (*head == NULL) {
         *head = novoNo;
         return;
-    }
-
-    novoNo->next = *head;
-	(*head)->prev = novoNo; //Define o anterior do antigo primeiro nó
-    *head = novoNo;
+    }else{
+		novoNo->next = *head;
+		(*head)->prev = novoNo;//Define o anterior do antigo primeiro nó
+    	*head = novoNo;
+	}
 }
 
 //Funcao para adicionar no antes de um Valor
-void adicionarAntes(BigNumber **head, int numero, int novoDigito) {
-	if (*head == NULL) {
-        printf("Lista vazia! Não é possível adicionar antes.\n");
-        return;
-    }
-
-	BigNumber* temp = *head;
-    while (temp != NULL && temp->digito != numero) {
-        temp = temp->next;
-    }
-
-   if (temp == NULL) {
-        printf("Número %d não encontrado na lista.\n", numero);
-        return;
-    }
-
-    BigNumber* novoNo = criarNo(novoDigito);
-    novoNo->next = temp;
-    novoNo->prev = temp->prev;
-
-    if (temp->prev != NULL) { // Caso não seja o primeiro nó
-        temp->prev->next = novoNo;
-    } else { // Atualiza o head se for o primeiro nó
-        *head = novoNo;
-    }
-
-    temp->prev = novoNo;
-}
-
-//Função para adicionar um nó depois de um nó com um valor específico
-void adicionarDepois(BigNumber *head, int valorDepois, int digito) {
-    if (head == NULL) {
-        printf("Lista vazia! Não é possível adicionar depois.\n");
-        return;
-    }
-
-    BigNumber* temp = head;
-    while (temp != NULL && temp->digito != valorDepois) {
-        temp = temp->next;
-    }
-
-    if (temp == NULL) {
-        printf("Número %d não encontrado na lista.\n", valorDepois);
-        return;
-    }
-
-    BigNumber* novoNo = criarNo(digito);
-    novoNo->next = temp->next;
-    novoNo->prev = temp;
-
-    if (temp->next != NULL) {
-        temp->next->prev = novoNo;
-    }
-
-    temp->next = novoNo;
-}
-
-//Função para remover um nó com o número especificado
-void removerNumero(BigNumber **head, int numero) {
-    if (*head == NULL) {
-        printf("Lista vazia! Não é possível remover.\n");
-        return;
-    }
-
+void adicionarAntes(BigNumber** head, int numero, int novoDigito) {
     BigNumber* temp = *head;
     while (temp != NULL && temp->digito != numero) {
         temp = temp->next;
     }
-
-    if (temp == NULL) {
-        printf("Número %d não encontrado na lista.\n", numero);
-        return;
-    }
-
-    if (temp->prev != NULL) { // Caso não seja o primeiro nó
-        temp->prev->next = temp->next;
-    } else { // Atualiza o head se for o primeiro nó
-        *head = temp->next;
-    }
-
-    if (temp->next != NULL) { // Caso não seja o último nó
-        temp->next->prev = temp->prev;
-    }
-
-    free(temp);
-}
-
-BigNumber* encontrarNumero(BigNumber *head, int numero) {
-    BigNumber* temp = head;
-    
-    while (temp != NULL) {
-        if (temp->digito == numero) {
-            return temp;//Número encontrado
+    if (temp != NULL) {
+        BigNumber* novo = criarNo(novoDigito);
+        novo->prev = temp->prev;
+        novo->next = temp;
+        if (temp->prev != NULL) {
+            temp->prev->next = novo;
         }
-        temp = temp->next;//Avança para o próximo nó
+        temp->prev = novo;
+        if (temp == *head) {
+            *head = novo;
+        }
     }
-    
-    return NULL;//Número não encontrado
 }
+
+//Função para adicionar um nó depois de um nó com um valor específico
+void adicionarDepois(BigNumber* head, int valorDepois, int digito) {
+    BigNumber* temp = head;
+    while (temp != NULL && temp->digito != valorDepois) {
+        temp = temp->next;
+    }
+    if (temp != NULL) {
+        BigNumber* novo = criarNo(digito);
+        novo->next = temp->next;
+        novo->prev = temp;
+        if (temp->next != NULL) {
+            temp->next->prev = novo;
+        }
+        temp->next = novo;
+    }
+}
+
+//Função para ler um número com seu sinal corretamente
+BigNumber* lerNumeroComSinal(int* sinal) {
+    BigNumber* numero = NULL;
+    char c;
+
+    
+    *sinal = 1;  
+    while (scanf("%c", &c) && c != '\n') {
+        if (c == '+') {
+            continue;  
+        } else if (c == '-') {
+            *sinal = -1;  
+            continue;  
+        }
+        
+        adicionarNoFim(&numero, c - '0');
+    }
+
+    return numero;
+}
+
+//Função para remover um nó com o número especificado
+void removerNumero(BigNumber** head, int numero) {
+    BigNumber* temp = *head;
+    while (temp != NULL && temp->digito != numero) {
+        temp = temp->next;
+    }
+    if (temp != NULL) {
+        if (temp->prev != NULL) {
+            temp->prev->next = temp->next;
+        }
+        if (temp->next != NULL) {
+            temp->next->prev = temp->prev;
+        }
+        if (temp == *head) {
+            *head = temp->next;
+        }
+        free(temp);
+    }
+}
+
+//Funcao para encontrar número específico
+BigNumber* encontrarNumero(BigNumber* head, int numero) {
+    BigNumber* temp = head;
+    while (temp != NULL && temp->digito != numero) {
+        temp = temp->next;
+    }
+    return temp;  // Retorna NULL se não encontrar
+}
+
 
 //Função para contar o número de elementos na lista
-int contarElementos(BigNumber *head) {
+int contarElementos(BigNumber* head) {
     int contador = 0;
     BigNumber* temp = head;
-    
     while (temp != NULL) {
-        contador++; //Incrementa o contador para cada nó
-        temp = temp->next; //Avança para o próximo nó
+        contador++;
+        temp = temp->next;
     }
-    
     return contador;
 }
 
+
 //funcao para imprimir a lista encadeada
-void imprimirLista(BigNumber *head) {
+void imprimirLista(BigNumber *head, int sinal) {
+    if (sinal == -1) {
+        printf("-");
+    }
     BigNumber* temp = head;
-    printf("Lista: ");
     while (temp != NULL) {
-        printf("%d ", temp->digito);
+        printf("%d", temp->digito);
         temp = temp->next;
     }
     printf("\n");
 }
 
 //funcao para liberar a memoria da lista 
-void liberaMemoria(BigNumber *head) {
-    BigNumber *temp;
+void liberaMemoria(BigNumber* head) {
     while (head != NULL) {
-        temp = head;        
-        head = head->next;   
-        free(temp);          
+        BigNumber* temp = head;
+        head = head->next;
+        free(temp);
     }
 }
 

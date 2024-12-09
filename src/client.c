@@ -2,51 +2,28 @@
 #include "bignumber.h"
 
 int main() {
-    BigNumber* lista = NULL;
+    int n;
+    scanf("%d", &n); 
+    getchar();
 
-    //Testando adicionar no início
-    adicionarInicio(&lista, 3);
-    adicionarInicio(&lista, 2);
-    adicionarInicio(&lista, 1);
-    printf("Lista após adicionar no início: ");
-    imprimirLista(lista);
-
-    //Testando adicionar no fim
-    adicionarNoFim(&lista, 4);
-    adicionarNoFim(&lista, 5);
-    printf("Lista após adicionar no fim: ");
-    imprimirLista(lista);
-
-    //Testando adicionar antes de um número
-    adicionarAntes(&lista, 3, 0);
-    printf("Lista após adicionar 0 antes de 3: ");
-    imprimirLista(lista);
-
-    //Testando adicionar depois de um número
-    adicionarDepois(lista, 3, 7);  
-    printf("Lista após adicionar 7 depois de 3: ");
-    imprimirLista(lista);
-
-    //Testando encontrar um número
-    BigNumber* encontrado = encontrarNumero(lista, 7);
-    if (encontrado) {
-        printf("Número 7 encontrado: %d\n", encontrado->digito);
-    } else {
-        printf("Número 7 não encontrado.\n");
+    for (int i = 0; i < n; i++) {
+        int sinal1, sinal2;
+        
+        BigNumber* num1 = lerNumeroComSinal(&sinal1);
+        BigNumber* num2 = lerNumeroComSinal(&sinal2);
+        
+        char operacao;
+        scanf("%c", &operacao);
+        getchar();  
+        
+        printf("Número 1: ");
+        imprimirLista(num1, sinal1);
+        printf("Número 2: ");
+        imprimirLista(num2, sinal2);
+        
+        liberaMemoria(num1);
+        liberaMemoria(num2);
     }
-
-    //Testando remover um número
-    removerNumero(&lista, 7); 
-    printf("Lista após remover 7: ");
-    imprimirLista(lista);
-
-    //Testando contar elementos
-    int count = contarElementos(lista);
-    printf("Número de elementos na lista: %d\n", count);
-
-    //Liberando memória
-    liberaMemoria(lista);
-    printf("Memória liberada.\n");
 
     return 0;
 }
