@@ -3,24 +3,29 @@
 
 //Definindo a estrutura BigNumber
 typedef struct BigNumber {
-	
-	int digito; //dado armazenado
-	struct BigNumber *next; //proximo no
-	struct BigNumber *prev; //no anterior
-
+    int digito; //Dado armazenado (dígito do número)
+    struct BigNumber* next; //Próximo nó
+    struct BigNumber* prev; //Nó anterior
 } BigNumber;
 
-//------------------------------------------------------------------------------------------------------Funcoes Principais
-BigNumber* criarNo(int digito); //funcao para criar no com um digito
-void adicionarNoFim(BigNumber **head, int digito);//funcao para adicionar no no fim da fila 
-void adicionarInicio(BigNumber** head, int valor);//Função para adicionar um nó no início da lista
-void adicionarAntes(BigNumber **head, int numero, int novoDigito);//Funcao para adicionar no no inicio da
-void adicionarDepois(BigNumber* head, int valorDepois, int digito);//Função para adicionar um nó depois de um nó com um valor específico
-BigNumber* lerNumeroComSinal(int* sinal); // Função para ler um número e armazená-lo na lista
-void removerNumero(BigNumber **head, int numero);//Função para remover um nó com o número especificado
-BigNumber* encontrarNumero(BigNumber *head, int numero);// Função para encontrar um número na lista
-int contarElementos(BigNumber *head);//Função para contar o número de elementos na lista
-void imprimirLista(BigNumber *head, int sinal);//funcao para imprimir a lista encadeada
-void liberaMemoria(BigNumber *head);//funcao liberar memoria da lista
+//Estrutura que representa um número completo
+typedef struct {
+    int sinal; //Sinal do número (+1 ou -1)
+    BigNumber* head; //Ponteiro para o início da lista
+} BigNumberStruct;
+
+// ------------------------------------------------------------------------------------------------------ Funções Principais
+BigNumber* criarNo(int digito); //Função para criar nó com um dígito
+BigNumberStruct* criarBigNumber(); //Função para inicializar um BigNumber com sinal
+void adicionarNoFim(BigNumberStruct* numero, int digito); //Função para adicionar nó no fim da lista
+void adicionarInicio(BigNumberStruct* numero, int digito); //Função para adicionar nó no início da lista
+void adicionarAntes(BigNumberStruct* numero, int valor, int novoDigito);//Função para adicionar antes de um valor
+void adicionarDepois(BigNumberStruct* numero, int valorDepois, int digito);//Função para adicionar depois de um valor
+void lerNumeroComSinal(BigNumberStruct* numero); //Função para ler um número com sinal e armazená-lo na lista
+void removerNumero(BigNumberStruct* numero, int digito); //Função para remover um nó com o número especificado
+BigNumber* encontrarNumero(BigNumberStruct* numero, int digito); //Função para encontrar um nó na lista
+int contarElementos(BigNumberStruct* numero); //Função para contar o número de elementos na lista
+void imprimirNumero(BigNumberStruct* numero); //Função para imprimir a lista encadeada
+void liberaMemoria(BigNumberStruct* numero); //Função para liberar a memória da lista
 
 #endif
