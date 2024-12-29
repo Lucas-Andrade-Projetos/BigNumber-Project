@@ -95,16 +95,16 @@ void adicionarDepois(BigNumberStruct* numero, int valorDepois, int digito) {
 //Função para ler um número com sinal
 void lerNumeroComSinal(BigNumberStruct* num) {
     char c;
-    scanf(" %c", &c);  // Lê o sinal ou o primeiro caractere
+    scanf(" %c", &c);  //Lê o sinal ou o primeiro caractere
 
     if (c == '+' || c == '-') {
-        num->sinal = (c == '-') ? -1 : 1;  // Define o sinal do número
+        num->sinal = (c == '-') ? -1 : 1;  //Define o sinal do número
     } else {
-        num->sinal = 1;  // Se não houver sinal, o número é positivo por padrão
-        ungetc(c, stdin);  // Coloca o caractere de volta no buffer para que o número seja lido corretamente
+        num->sinal = 1;  //Se não houver sinal, o número é positivo por padrão
+        ungetc(c, stdin);  //Coloca o caractere de volta no buffer para que o número seja lido corretamente
     }
 
-    // Lê o número e o adiciona à lista
+    //Lê o número e o adiciona à lista
     while (scanf("%c", &c) && c != '\n') {
         if (c >= '0' && c <= '9') {
             adicionarNoFim(num, c - '0');
