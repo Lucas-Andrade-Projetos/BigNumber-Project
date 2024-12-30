@@ -26,6 +26,8 @@ void removerNumero(BigNumberStruct* numero, int digito); //Função para remover
 BigNumber* encontrarNumero(BigNumberStruct* numero, int digito); //Função para encontrar um nó na lista
 int contarElementos(BigNumberStruct* numero); //Função para contar o número de elementos na lista
 int comparaBigNumbers(BigNumberStruct* num1, BigNumberStruct* num2);
+void removerInicio(BigNumberStruct* numero);
+void removerZeros(BigNumberStruct* numero);
 void imprimirNumero(BigNumberStruct* numero); //Função para imprimir a lista encadeada
 void liberaMemoria(BigNumberStruct* numero); //Função para liberar a memória da lista
 

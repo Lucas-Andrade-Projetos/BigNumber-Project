@@ -95,13 +95,13 @@ void adicionarDepois(BigNumberStruct* numero, int valorDepois, int digito) {
 //Função para ler um número com sinal
 void lerNumeroComSinal(BigNumberStruct* num) {
     char c;
-    scanf(" %c", &c);  // Lê o sinal ou o primeiro caractere
+    scanf(" %c", &c);  //Lê o sinal ou o primeiro caractere
 
     if (c == '+' || c == '-') {
-        num->sinal = (c == '-') ? -1 : 1;  // Define o sinal do número
+        num->sinal = (c == '-') ? -1 : 1;  //Define o sinal do número
     } else {
-        num->sinal = 1;  // Se não houver sinal, o número é positivo por padrão
-        ungetc(c, stdin);  // Coloca o caractere de volta no buffer para que o número seja lido corretamente
+        num->sinal = 1;  //Se não houver sinal, o número é positivo por padrão
+        ungetc(c, stdin);  //Coloca o caractere de volta no buffer para que o número seja lido corretamente
     }
 
     // Lê o número e o adiciona à lista
@@ -181,6 +181,29 @@ int comparaBigNumbers(BigNumberStruct* numero1, BigNumberStruct* numero2) {
     return 0;//Os números são iguais
 }
 
+// Função para remover numeros no inicio
+void removerInicio(BigNumberStruct* numero) {
+    if (numero->head == NULL) {
+        return; // Nada a remover
+    }
+    BigNumber* temp = numero->head;
+    numero->head = numero->head->next;
+    if (numero->head != NULL) {
+        numero->head->prev = NULL;
+    }
+    free(temp);
+}
+
+// Função para remover zeros à esquerda
+void removerZeros(BigNumberStruct* numero) {
+    while (numero->head != NULL && numero->head->digito == 0 && numero->head->next != NULL) {
+        removerInicio(numero);
+    }
+    if (numero->head == NULL) {
+        adicionarInicio(numero, 0);
+    }
+}
+
 //Função para imprimir o BigNumber
 void imprimirNumero(BigNumberStruct* numero) {
     if (numero == NULL || numero->head == NULL) {
@@ -218,17 +241,51 @@ BigNumberStruct* executarOperacao(char operacao, BigNumberStruct* numero1, BigNu
     BigNumberStruct* resultado = NULL;
 
     if (operacao == '+') {
-        resultado = somaBigNumber(numero1, numero2);
-    }else{
-        printf("Cooming soon...");
+        //sinais iguais.
+        if (numero1->sinal == 1 && numero2->sinal == 1) {
+            resultado = somaBigNumber(numero1, numero2);
+        } else if (numero1->sinal == 1 && numero2->sinal == -1) {
+            //a positivo e b negativo
+            numero2->sinal = 1;
+            resultado = subtrairBigNumbers(numero1, numero2);
+        } else if (numero1->sinal == '-' && numero2->sinal == 1) {
+            //caso de a negativo e b positivo
+            numero1->sinal = 1;
+            resultado = subtrairBigNumbers(numero2, numero1);
+        } else {
+            //caso de ambos numeros negativos
+            numero1->sinal = 1; 
+            numero2->sinal = 1; 
+            resultado = somaBigNumber(numero1, numero2);
+            resultado->sinal = -1;  //Resultado negativo
+        }
+    }  
+    if (operacao == '-') {
+        if (numero1->sinal == 1 && numero2->sinal == 1) {
+            // a e b positivo
+            resultado = subtrairBigNumbers(numero1, numero2);
+        } else if (numero1->sinal == 1 && numero2->sinal == -1) {
+            //a positivo e b negativo
+            numero2->sinal = 1; 
+            resultado = somaBigNumber(numero1, numero2);
+        } else if (numero1->sinal == -1 && numero2->sinal == 1) {
+            // a positivo e b negativo
+            numero1->sinal = 1;
+            resultado = somaBigNumber(numero1, numero2);
+            resultado->sinal = '-';  // Resultado sempre negativo
+        } else {
+            //com ambos numeros negativos, inverte sinais
+            numero1->sinal = 1; 
+            numero2->sinal = 1; 
+            resultado = subtrairBigNumbers(numero2, numero1);
+        }
     }
-
+    
     return resultado;
 }
 
 //Função para somar dois BigNumberStruct
 BigNumberStruct* somaBigNumber(BigNumberStruct* numero1, BigNumberStruct* numero2) {
-    
     //sinais iguais------------------------------
     if (numero1->sinal == numero2->sinal) {
         BigNumberStruct* resultado = criarBigNumber();
@@ -284,52 +341,77 @@ BigNumberStruct* somaBigNumber(BigNumberStruct* numero1, BigNumberStruct* numero
     }
 }
 
-//Função para subtrair dois BigNumberStruct --- incompleta
+//Função para subtrair dois BigNumberStruct
 BigNumberStruct* subtrairBigNumbers(BigNumberStruct* numero1, BigNumberStruct* numero2) {
+    // Garantir que a ordem está correta para evitar resultados negativos inesperados
+    int comparacao = comparaBigNumbers(numero1, numero2);
+    
+    BigNumberStruct* maior;
+    BigNumberStruct* menor;
+    
+    if (comparacao >= 0) {
+        maior = numero1;
+        menor = numero2;
+    } else {
+        maior = numero2;
+        menor = numero1;
+    }
+
     BigNumberStruct* resultado = criarBigNumber();
-    BigNumber* temp1 = numero1->head;
-    BigNumber* temp2 = numero2->head;
+    BigNumber* tempMaior = maior->head;
+    BigNumber* tempMenor = menor->head;
 
-    while (temp1 != NULL && temp1->next != NULL) {
-        temp1 = temp1->next;
+    while (tempMaior != NULL && tempMaior->next != NULL) {
+        tempMaior = tempMaior->next;
     }
-    while (temp2 != NULL && temp2->next != NULL) {
-        temp2 = temp2->next;
+    while (tempMenor != NULL && tempMenor->next != NULL) {
+        tempMenor = tempMenor->next;
     }
 
-    int borrow = 0; 
+    int borrow = 0;
     int digito1 = 0, digito2 = 0;
 
-    while (temp1 != NULL || temp2 != NULL || borrow != 0) {
-        if (temp1 != NULL) {
-            digito1 = temp1->digito;
-            temp1 = temp1->prev; 
+    while (tempMaior != NULL || borrow != 0) {
+        if (tempMaior != NULL) {
+            digito1 = tempMaior->digito;
+        } else {
+            digito1 = 0;
         }
 
-        if (temp2 != NULL) {
-            digito2 = temp2->digito;
-            temp2 = temp2->prev;  
+        if (tempMenor != NULL) {
+            digito2 = tempMenor->digito;
+        } else {
+            digito2 = 0;
         }
 
         int subtracao = digito1 - digito2 - borrow;
         if (subtracao < 0) {
-            subtracao += 10; 
-            borrow = 1; 
+            subtracao += 10;
+            borrow = 1;
         } else {
-            borrow = 0; 
+            borrow = 0;
         }
 
         adicionarInicio(resultado, subtracao);
 
-        digito1 = 0;
-        digito2 = 0;
+        if (tempMaior != NULL) tempMaior = tempMaior->prev;
+        if (tempMenor != NULL) tempMenor = tempMenor->prev;
     }
 
-    if (comparaBigNumbers(numero1, numero2) < 0) {
-        resultado->sinal = numero2->sinal;
-    } else {
+    // Definir o sinal do resultado
+    if (comparacao >= 0) {
         resultado->sinal = numero1->sinal;
+    } else {
+        if (numero2->sinal == 1) {
+            resultado->sinal = -1;
+        } else {
+            resultado->sinal = 1;
+        }
     }
+
+    // Remover zeros à esquerda
+    removerZeros(resultado);
+
     return resultado;
 }
 
