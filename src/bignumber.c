@@ -204,6 +204,21 @@ void removerZeros(BigNumberStruct* numero) {
     }
 }
 
+//função usada para fazer um bignumber ficar de trás para frente, para facilitar a multiplicação.
+BigNumberStruct* reverterBigNumber(BigNumberStruct* numero) {
+    BigNumberStruct* numeroInvertido = criarBigNumber();  
+    BigNumber* temp = numero->head;
+    
+    while (temp != NULL) {
+        adicionarInicio(numeroInvertido, temp->digito);  
+        temp = temp->next;  
+    }
+
+    numeroInvertido->sinal = numero->sinal;
+
+    return numeroInvertido;  
+}
+
 //Função para imprimir o BigNumber
 void imprimirNumero(BigNumberStruct* numero) {
     if (numero == NULL || numero->head == NULL) {
@@ -278,6 +293,27 @@ BigNumberStruct* executarOperacao(char operacao, BigNumberStruct* numero1, BigNu
             numero1->sinal = 1; 
             numero2->sinal = 1; 
             resultado = subtrairBigNumbers(numero2, numero1);
+        }
+    }
+    if (operacao == '*') {
+        if (numero1->sinal == 1 && numero2->sinal == 1) {
+            // a e b positivo
+            resultado = multiplicarBigNumbers(reverterBigNumber(numero1), reverterBigNumber(numero2));
+        } else if (numero1->sinal == 1 && numero2->sinal == -1) {
+            // a positivo e b com negativos
+            numero2->sinal = 1; 
+            resultado = multiplicarBigNumbers(reverterBigNumber(numero1), reverterBigNumber(numero2));
+            resultado->sinal = -1;
+        } else if (numero1->sinal == -1 && numero2->sinal == 1) {
+            // a negativo e b positivo
+            numero1->sinal = 1; 
+            resultado = multiplicarBigNumbers(reverterBigNumber(numero1), numero2);
+            resultado->sinal = -1;
+        } else {
+            //com ambos numeros negativos, vira positivo
+            numero1->sinal = 1; 
+            numero2->sinal = 1; 
+            resultado = multiplicarBigNumbers(reverterBigNumber(numero1), reverterBigNumber(numero2));
         }
     }
     
@@ -415,7 +451,41 @@ BigNumberStruct* subtrairBigNumbers(BigNumberStruct* numero1, BigNumberStruct* n
     return resultado;
 }
 
+//Função para multiplicar dois BigNumberStruct
+BigNumberStruct* multiplicarBigNumbers(BigNumberStruct* numero1, BigNumberStruct* numero2) {
+    int tamanho1 = contarElementos(numero1);
+    int tamanho2 = contarElementos(numero2);
+    
+    int resultado_tamanho = tamanho1 + tamanho2;
+    int* resultado = (int*)calloc(resultado_tamanho, sizeof(int));
 
+    BigNumber* temp1 = numero1->head;
+    for (int i = 0; i < tamanho1; i++) {
+        int carry = 0;
+        BigNumber* temp2 = numero2->head;
+        for (int j = 0; j < tamanho2; j++) {
+            int sum = temp1->digito *  temp2->digito + resultado[i + j] + carry;
+            carry = sum / 10;
+            resultado[i + j] = sum % 10;
+            temp2 = temp2->next;
+        }
+        resultado[i + tamanho2] += carry;
+        temp1 = temp1->next;
+    }
 
+    // Remove zeros à esquerda
+    while (resultado_tamanho > 1 && resultado[resultado_tamanho - 1] == 0) {
+        resultado_tamanho--;
+    }
 
+    BigNumberStruct* resultadoStruct = criarBigNumber();
+    for (int k = resultado_tamanho - 1; k >= 0; k--) {
+        if (resultado[k] != 0 || resultadoStruct->head != NULL) {
+            adicionarInicio(resultadoStruct, resultado[k]);
+        }
+    }
+    free(resultado);
+
+    return reverterBigNumber(resultadoStruct);
+}
 

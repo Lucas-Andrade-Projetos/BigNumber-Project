@@ -34,7 +34,7 @@ int main() {
 
             liberaMemoria(resultado);
         }
-
+        
         //Liberando a memória
         liberaMemoria(num1);
         liberaMemoria(num2);
