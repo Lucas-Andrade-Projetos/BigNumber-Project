@@ -28,14 +28,18 @@ int contarElementos(BigNumberStruct* numero); //Função para contar o número d
 int comparaBigNumbers(BigNumberStruct* num1, BigNumberStruct* num2);
 void removerInicio(BigNumberStruct* numero);
 void removerZeros(BigNumberStruct* numero);
+BigNumberStruct* reverterBigNumber(BigNumberStruct* numero);
 void imprimirNumero(BigNumberStruct* numero); //Função para imprimir a lista encadeada
 void liberaMemoria(BigNumberStruct* numero); //Função para liberar a memória da lista
 
+void adicionarNoFinal(BigNumber** head, int digito);
 
 //----------------------------------------------------------------Funções de Operações
 BigNumberStruct* executarOperacao(char operacao, BigNumberStruct* num1, BigNumberStruct* num2);
 BigNumberStruct* somaBigNumber(BigNumberStruct* num1, BigNumberStruct* num2);
 BigNumberStruct* subtrairBigNumbers(BigNumberStruct* numero1, BigNumberStruct* numero2);
+BigNumberStruct* multiplicarBigNumbers(BigNumberStruct* num1, BigNumberStruct* num2);
+
 
 
 
