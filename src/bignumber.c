@@ -29,6 +29,26 @@ BigNumberStruct* criarBigNumber() {
     return numero;
 }
 
+//Função para criar um bignumber já com valor definido
+BigNumberStruct* criarBigNumberDeNumero(long long numero) {
+    BigNumberStruct* novoBigNumber = criarBigNumber();
+
+    if (numero < 0) {
+        novoBigNumber->sinal = -1;
+        numero = -numero;
+    } else {
+        novoBigNumber->sinal = 1;
+    }
+    do {
+        int digito = numero % 10;
+        adicionarInicio(novoBigNumber, digito);  
+        numero /= 10;
+    } while (numero > 0);
+
+    return novoBigNumber;
+}
+
+
 //Função para adicionar nó no final da lista
 void adicionarNoFim(BigNumberStruct* numero, int digito) {
     BigNumber* novoNo = criarNo(digito);
@@ -153,7 +173,7 @@ int contarElementos(BigNumberStruct* numero) {
     return contador;
 }
 
-//Funçao que compara a magnetudo dos dígitos
+//Funçao que compara a magnetudo dos dígitos, ou seja vê qual é maior que o outro.
 int comparaBigNumbers(BigNumberStruct* numero1, BigNumberStruct* numero2) {
     //Compara o número de dígitos(As funções operacionais são úteis);
     int digitos1 = contarElementos(numero1);
@@ -178,7 +198,7 @@ int comparaBigNumbers(BigNumberStruct* numero1, BigNumberStruct* numero2) {
         temp2 = temp2->next;
     }
 
-    return 0;//Os números são iguais
+    return 0;
 }
 
 // Função para remover numeros no inicio
@@ -307,7 +327,7 @@ BigNumberStruct* executarOperacao(char operacao, BigNumberStruct* numero1, BigNu
         } else if (numero1->sinal == -1 && numero2->sinal == 1) {
             // a negativo e b positivo
             numero1->sinal = 1; 
-            resultado = multiplicarBigNumbers(reverterBigNumber(numero1), numero2);
+            resultado = multiplicarBigNumbers(reverterBigNumber(numero1), reverterBigNumber(numero2));
             resultado->sinal = -1;
         } else {
             //com ambos numeros negativos, vira positivo
@@ -316,6 +336,27 @@ BigNumberStruct* executarOperacao(char operacao, BigNumberStruct* numero1, BigNu
             resultado = multiplicarBigNumbers(reverterBigNumber(numero1), reverterBigNumber(numero2));
         }
     }
+	if(operacao == '/'){
+		if (numero1->sinal == 1 && numero2->sinal == 1) {
+            // a e b positivo
+            resultado = dividirBigNumbers(numero1, numero2);
+        } else if (numero1->sinal == 1 && numero2->sinal == -1) {
+            // a positivo e b com negativos
+            numero2->sinal = 1; 
+            resultado = dividirBigNumbers(numero1, numero2);
+            resultado->sinal = -1;
+        } else if (numero1->sinal == -1 && numero2->sinal == 1) {
+            // a negativo e b positivo
+            numero1->sinal = 1; 
+            resultado = dividirBigNumbers(numero1, numero2);
+            resultado->sinal = -1;
+        } else {
+            //com ambos numeros negativos, vira positivo
+            numero1->sinal = 1; 
+            numero2->sinal = 1; 
+            resultado = dividirBigNumbers(numero1, numero2);
+        }
+	}
     
     return resultado;
 }
@@ -488,4 +529,45 @@ BigNumberStruct* multiplicarBigNumbers(BigNumberStruct* numero1, BigNumberStruct
 
     return reverterBigNumber(resultadoStruct);
 }
+
+//Função para dividir dois BigNumberStruct com resultado inteiro
+BigNumberStruct* dividirBigNumbers(BigNumberStruct* dividendo, BigNumberStruct* divisor) {
+    
+	if (divisor->head == NULL || (contarElementos(divisor) == 1 && divisor->head->digito == 0)) {
+        printf("Erro: Divisão por zero.\n");
+        return NULL;
+    }
+
+ 
+    BigNumberStruct* quociente = criarBigNumber();
+    BigNumberStruct* resto = criarBigNumber(); 
+
+
+    BigNumber* temp = dividendo->head;
+
+    while (temp != NULL) {
+       
+        adicionarNoFim(resto, temp->digito);
+        removerZeros(resto);
+
+        
+        int count = 0;
+        while (comparaBigNumbers(resto, divisor) >= 0) {
+            BigNumberStruct* subtracao = subtrairBigNumbers(resto, divisor);
+            liberaMemoria(resto);  
+            resto = subtracao;
+            count++;
+        }
+
+        adicionarNoFim(quociente, count);
+        temp = temp->next;
+    }
+
+    removerZeros(quociente);
+
+    liberaMemoria(resto);
+
+    return quociente;
+}
+
 
