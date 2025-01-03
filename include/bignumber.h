@@ -22,7 +22,7 @@ void adicionarNoFim(BigNumberStruct* numero, int digito); //Função para adicio
 void adicionarInicio(BigNumberStruct* numero, int digito); //Função para adicionar nó no início da lista
 void adicionarAntes(BigNumberStruct* numero, int valor, int novoDigito);//Função para adicionar antes de um valor
 void adicionarDepois(BigNumberStruct* numero, int valorDepois, int digito);//Função para adicionar depois de um valor
-void lerNumeroComSinal(BigNumberStruct* numero); //Função para ler um número com sinal e armazená-lo na lista
+int lerNumeroComSinal(BigNumberStruct* num); //Função para ler um número com sinal e armazená-lo na lista
 void removerNumero(BigNumberStruct* numero, int digito); //Função para remover um nó com o número especificado
 BigNumber* encontrarNumero(BigNumberStruct* numero, int digito); //Função para encontrar um nó na lista
 int contarElementos(BigNumberStruct* numero); //Função para contar o número de elementos na lista
@@ -41,9 +41,5 @@ BigNumberStruct* somaBigNumber(BigNumberStruct* num1, BigNumberStruct* num2); //
 BigNumberStruct* subtrairBigNumbers(BigNumberStruct* numero1, BigNumberStruct* numero2); //Função para subtrair dois BigNumberStruct
 BigNumberStruct* multiplicarBigNumbers(BigNumberStruct* num1, BigNumberStruct* num2); //Função para multiplicar dois BigNumberStruct
 BigNumberStruct* dividirBigNumbers(BigNumberStruct* dividendo, BigNumberStruct* divisor); //Função para dividir dois BigNumberStruct com resultado inteiro.
-
-
-
-
 
 #endif
