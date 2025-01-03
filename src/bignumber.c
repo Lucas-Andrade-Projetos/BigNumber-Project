@@ -128,7 +128,7 @@ int lerNumeroComSinal(BigNumberStruct* num) {
     }
 
     // Lê o número e o adiciona à lista
-    while (scanf("%c", &c) && c != '\n') {
+    while (scanf("%c", &c) == 1 && c != '\n') {
         if (c >= '0' && c <= '9') {
             adicionarNoFim(num, c - '0');
         }
