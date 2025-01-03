@@ -113,23 +113,28 @@ void adicionarDepois(BigNumberStruct* numero, int valorDepois, int digito) {
 }
 
 //Função para ler um número com sinal
-void lerNumeroComSinal(BigNumberStruct* num) {
+int lerNumeroComSinal(BigNumberStruct* num) {
     char c;
-    scanf(" %c", &c);  //Lê o sinal ou o primeiro caractere
+
+    if (scanf(" %c", &c) == EOF) {
+        return -1;  
+    }
 
     if (c == '+' || c == '-') {
-        num->sinal = (c == '-') ? -1 : 1;  //Define o sinal do número
+        num->sinal = (c == '-') ? -1 : 1;  // Define o sinal do número
     } else {
-        num->sinal = 1;  //Se não houver sinal, o número é positivo por padrão
-        ungetc(c, stdin);  //Coloca o caractere de volta no buffer para que o número seja lido corretamente
+        num->sinal = 1;  
+        ungetc(c, stdin);  
     }
 
     // Lê o número e o adiciona à lista
-    while (scanf("%c", &c) && c != '\n') {
+    while (scanf("%c", &c) == 1 && c != '\n') {
         if (c >= '0' && c <= '9') {
             adicionarNoFim(num, c - '0');
         }
     }
+
+    return 0; 
 }
 
 //Função para remover um nó com o número especificado
@@ -283,7 +288,7 @@ BigNumberStruct* executarOperacao(char operacao, BigNumberStruct* numero1, BigNu
             //a positivo e b negativo
             numero2->sinal = 1;
             resultado = subtrairBigNumbers(numero1, numero2);
-        } else if (numero1->sinal == '-' && numero2->sinal == 1) {
+        } else if (numero1->sinal == -1 && numero2->sinal == 1) {
             //caso de a negativo e b positivo
             numero1->sinal = 1;
             resultado = subtrairBigNumbers(numero2, numero1);
@@ -307,7 +312,7 @@ BigNumberStruct* executarOperacao(char operacao, BigNumberStruct* numero1, BigNu
             // a positivo e b negativo
             numero1->sinal = 1;
             resultado = somaBigNumber(numero1, numero2);
-            resultado->sinal = '-';  // Resultado sempre negativo
+            resultado->sinal = -1;  // Resultado sempre negativo
         } else {
             //com ambos numeros negativos, inverte sinais
             numero1->sinal = 1; 
@@ -341,21 +346,30 @@ BigNumberStruct* executarOperacao(char operacao, BigNumberStruct* numero1, BigNu
             // a e b positivo
             resultado = dividirBigNumbers(numero1, numero2);
         } else if (numero1->sinal == 1 && numero2->sinal == -1) {
-            // a positivo e b com negativos
-            numero2->sinal = 1; 
-            resultado = dividirBigNumbers(numero1, numero2);
-            resultado->sinal = -1;
+    		// a negativo e b positivo
+   			numero1->sinal = 1; 
+    		resultado = dividirBigNumbers(numero1, numero2);
+    
+    		// Se o resultado não for zero, define o sinal como negativo
+   			 if (resultado->head != NULL && resultado->head->digito != 0) {
+       		 resultado->sinal = -1;
+    		}
         } else if (numero1->sinal == -1 && numero2->sinal == 1) {
-            // a negativo e b positivo
-            numero1->sinal = 1; 
-            resultado = dividirBigNumbers(numero1, numero2);
-            resultado->sinal = -1;
+    		// a negativo e b positivo
+   			numero1->sinal = 1; 
+    		resultado = dividirBigNumbers(numero1, numero2);
+    
+    		// Se o resultado não for zero, define o sinal como negativo
+   			 if (resultado->head != NULL && resultado->head->digito != 0) {
+       		 resultado->sinal = -1;
+    		}
         } else {
             //com ambos numeros negativos, vira positivo
             numero1->sinal = 1; 
             numero2->sinal = 1; 
             resultado = dividirBigNumbers(numero1, numero2);
         }
+
 	}
     
     return resultado;
@@ -564,6 +578,11 @@ BigNumberStruct* dividirBigNumbers(BigNumberStruct* dividendo, BigNumberStruct* 
     }
 
     removerZeros(quociente);
+
+	if (quociente->head == NULL || (quociente->head->digito == 0 && quociente->head->next == NULL)) {
+        // Se o quociente for zero, forçar sinal positivo
+        quociente->sinal = 1;
+    }
 
     liberaMemoria(resto);
 

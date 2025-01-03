@@ -2,43 +2,52 @@
 #include "bignumber.h"
 
 int main() {
-    int n;
-    scanf("%d", &n); 
-    getchar();  //Para consumir o '\n' após a leitura do número de casos
-
-    for (int i = 0; i < n; i++) { 
-        //Criando os BigNumbers
+    while (1) {
         BigNumberStruct* num1 = criarBigNumber();
         BigNumberStruct* num2 = criarBigNumber();
-        
-        lerNumeroComSinal(num1);
-        lerNumeroComSinal(num2);
 
-        //Lendo a operação
+        if (lerNumeroComSinal(num1) == -1) { 
+            liberaMemoria(num1);
+            liberaMemoria(num2);
+            break;
+        }
+        if (lerNumeroComSinal(num2) == -1) { 
+            liberaMemoria(num1);
+            liberaMemoria(num2);
+            break;
+        }
         char operacao;
-        scanf("%c", &operacao);  
-        getchar(); 
+        if (scanf(" %c", &operacao) == EOF) {
+            liberaMemoria(num1);
+            liberaMemoria(num2);
+            break;
+        }
+		//printf("-----------------------------------\n");
+		//printf("print ai\n");
+		//imprimirNumero(num1);
+		//printf("\n");
+		//imprimirNumero(num2);
+		//printf("\n");
+		//printf("-----------------------------------\n");
+        BigNumberStruct* resultado = executarOperacao(operacao, num1, num2);
 
-        //Imprimindo os números
-        printf("Número 1: ");
-        imprimirNumero(num1);
-        printf("Número 2: ");
-        imprimirNumero(num2);
-
-        //Realizando as operações de soma
-        BigNumberStruct* resultado = executarOperacao(operacao, num1, num2); 
-
-        if(resultado != NULL){
-            printf("Resultado da operação: ");
-            imprimirNumero(resultado);
-
+		//teste com print 
+		//printf("print ai\n");
+		//imprimirNumero(num1);
+		//printf("\n");
+		//imprimirNumero(num2);
+		//printf("\n");
+		//printf("-----------------------------------\n");
+        if (resultado != NULL) {
+            imprimirNumero(resultado); 
+            fflush(stdout);  
+			//printf("\n");
             liberaMemoria(resultado);
         }
-        
-        //Liberando a memória
+
         liberaMemoria(num1);
         liberaMemoria(num2);
     }
-
+	printf("\n");
     return 0;
 }
