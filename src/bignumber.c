@@ -6,185 +6,212 @@
 
 //Função para criar um nó
 BigNumber* criarNo(int digito) {
-     BigNumber* novoNo = (BigNumber*)malloc(sizeof(BigNumber));
-    if (!novoNo) {
-        printf("Erro ao alocar memória!\n");
-        return NULL; 
+    
+	BigNumber* novoNo = (BigNumber*)malloc(sizeof(BigNumber)); //Aloca memória para um novo nó
+    if (!novoNo) { //Verifica se a alocação falhou
+        return NULL; //Retorna NULL em caso de erro
     }
-    novoNo->digito = digito;
-    novoNo->next = NULL;
-    novoNo->prev = NULL;
-    return novoNo;
+
+    novoNo->digito = digito; //Define o dígito no nó
+    novoNo->next = NULL;     //Inicializa o ponteiro para o próximo nó como NULL
+    novoNo->prev = NULL;     //Inicializa o ponteiro para o nó anterior como NULL
+    
+	return novoNo; //Retorna o ponteiro para o nó recém-criado
 }
 
-//Função para inicializar um BigNumberStruct
+//Função para inicializar um BigNumberStruct (Essa função eu uso para guardar o sinal do bignumber, foi muito útil para verificações e aloocações futuras)
 BigNumberStruct* criarBigNumber() {
-    BigNumberStruct* numero = (BigNumberStruct*)malloc(sizeof(BigNumberStruct));
-    if (!numero) {
-        printf("Erro ao alocar memória para BigNumberStruct!\n");
-        return NULL; 
+   
+    BigNumberStruct* numero = (BigNumberStruct*)malloc(sizeof(BigNumberStruct)); //Aloca memória para a estrutura
+    if (!numero) { //Verifica se a alocação falhou
+        return NULL; //Retorna NULL em caso de erro
     }
-    numero->sinal = 1; 
-    numero->head = NULL;
-    return numero;
+
+    numero->sinal = 1; //Inicializa o sinal como positivo (1)
+    numero->head = NULL; //Define o ponteiro para a cabeça da lista como NULL
+
+    return numero; //Retorna o ponteiro para a estrutura recém-criada
 }
 
-//Função para criar um bignumber já com valor definido
+//Função para criar um bignumber já com valor definido (Usado apenas para debugs no terminal).
 BigNumberStruct* criarBigNumberDeNumero(long long numero) {
-    BigNumberStruct* novoBigNumber = criarBigNumber();
+    
+	BigNumberStruct* novoBigNumber = criarBigNumber(); //Cria uma estrutura inicializada
 
-    if (numero < 0) {
-        novoBigNumber->sinal = -1;
-        numero = -numero;
+    if (numero < 0) { //Verifica se o número é negativo
+        novoBigNumber->sinal = -1; //Define o sinal como negativo
+        numero = -numero; //Converte o número para positivo
     } else {
-        novoBigNumber->sinal = 1;
+        novoBigNumber->sinal = 1; //Define o sinal como positivo
     }
+
+    //Divide o número em dígitos e os adiciona no início da lista
     do {
-        int digito = numero % 10;
-        adicionarInicio(novoBigNumber, digito);  
-        numero /= 10;
-    } while (numero > 0);
+        int digito = numero % 10; //Obtém o último dígito
+        adicionarInicio(novoBigNumber, digito); //Adiciona o dígito à lista
+        numero /= 10; //Remove o último dígito do número
+    } while (numero > 0); //Repete até que todos os dígitos sejam processados
 
-    return novoBigNumber;
+    return novoBigNumber; //Retorna o ponteiro para o BigNumberStruct criado
 }
-
 
 //Função para adicionar nó no final da lista
 void adicionarNoFim(BigNumberStruct* numero, int digito) {
-    BigNumber* novoNo = criarNo(digito);
-    if (numero->head == NULL) {
-        numero->head = novoNo;
+    
+	BigNumber* novoNo = criarNo(digito); //Cria um novo nó com o dígito fornecido
+    if (numero->head == NULL) { //Verifica se a lista está vazia
+        numero->head = novoNo; //Define o nó como o primeiro da lista
     } else {
-        BigNumber* temp = numero->head;
-        while (temp->next != NULL) {
+        BigNumber* temp = numero->head; //Inicializa um ponteiro temporário na cabeça da lista
+        while (temp->next != NULL) { //Percorre a lista até o último nó
             temp = temp->next;
         }
-        temp->next = novoNo;
-        novoNo->prev = temp;
+        temp->next = novoNo; //Conecta o novo nó ao final da lista
+        novoNo->prev = temp; //Define o nó anterior do novo nó
     }
 }
 
 //Função para adicionar um nó no início da lista
 void adicionarInicio(BigNumberStruct* numero, int digito) {
-    BigNumber* novoNo = criarNo(digito);
-    if (numero->head == NULL) {
-        numero->head = novoNo;
+	
+	BigNumber* novoNo = criarNo(digito); //Cria um novo nó com o dígito fornecido
+    
+	if (numero->head == NULL) { //Verifica se a lista está vazia
+        numero->head = novoNo; //Define o nó como o primeiro da lista
     } else {
-        novoNo->next = numero->head;
-        numero->head->prev = novoNo;
-        numero->head = novoNo;
+        novoNo->next = numero->head; //Conecta o novo nó ao início da lista
+        numero->head->prev = novoNo; //Define o novo nó como o anterior ao nó atual
+        numero->head = novoNo; //Atualiza a cabeça da lista para o novo nó
     }
 }
 
 //Função para adicionar antes de um valor
 void adicionarAntes(BigNumberStruct* numero, int valor, int novoDigito) {
-    BigNumber* temp = numero->head;
-    while (temp != NULL && temp->digito != valor) {
+    
+	BigNumber* temp = numero->head; //Inicia a busca na cabeça da lista
+    
+	while (temp != NULL && temp->digito != valor) { //Procura o nó com o valor desejado
         temp = temp->next;
     }
-    if (temp != NULL) {
-        BigNumber* novo = criarNo(novoDigito);
-        novo->prev = temp->prev;
-        novo->next = temp;
-        if (temp->prev != NULL) {
+    
+	if (temp != NULL) { //Verifica se o valor foi encontrado
+        BigNumber* novo = criarNo(novoDigito); //Cria o novo nó
+        novo->prev = temp->prev; //Conecta o nó anterior ao novo nó
+        novo->next = temp; //Conecta o novo nó ao nó atual
+        if (temp->prev != NULL) { //Atualiza o próximo do nó anterior, se existir
             temp->prev->next = novo;
-        } else {
+        } else { //Se o nó atual era a cabeça, redefine a cabeça
             numero->head = novo;
         }
-        temp->prev = novo;
+        temp->prev = novo; //Atualiza o anterior do nó atual
     }
 }
 
 //Função para adicionar depois de um valor
 void adicionarDepois(BigNumberStruct* numero, int valorDepois, int digito) {
-    BigNumber* temp = numero->head;
-    while (temp != NULL && temp->digito != valorDepois) {
+    
+	BigNumber* temp = numero->head; // Inicia a busca na cabeça da lista
+    
+	while (temp != NULL && temp->digito != valorDepois) { // Procura o nó com o valor desejado
         temp = temp->next;
     }
-    if (temp != NULL) {
-        BigNumber* novo = criarNo(digito);
-        novo->next = temp->next;
-        novo->prev = temp;
-        if (temp->next != NULL) {
+    
+	if (temp != NULL) { //Verifica se o valor foi encontrado
+        BigNumber* novo = criarNo(digito); // Cria o novo nó
+        novo->next = temp->next; //Conecta o novo nó ao próximo do nó atual
+        novo->prev = temp; //Conecta o novo nó ao nó atual
+        if (temp->next != NULL) { //Atualiza o anterior do próximo nó, se existir
             temp->next->prev = novo;
         }
-        temp->next = novo;
+        temp->next = novo; //Atualiza o próximo do nó atual
     }
 }
 
-//Função para ler um número com sinal
+//Função para ler um número com sinal (+ ou -) e o armazena na lista.
 int lerNumeroComSinal(BigNumberStruct* num) {
-    char c;
+    
+	char c;
 
     if (scanf(" %c", &c) == EOF) {
-        return -1;  
+        return -1; //Retorna -1 se chegar ao fim da entrada
     }
 
-    if (c == '+' || c == '-') {
-        num->sinal = (c == '-') ? -1 : 1;  // Define o sinal do número
-    } else {
-        num->sinal = 1;  
-        ungetc(c, stdin);  
-    }
-
-    // Lê o número e o adiciona à lista
+    if (c == '+' || c == '-') { //Verifica se há um sinal explícito 
+		if (c == '-') { 
+			num->sinal = -1; // Define o sinal como negativo  
+		} else { 
+			num->sinal = 1; // Define o sinal como positivo 
+		} 
+	} else { //Se não houver sinal explícito, assume positivo 
+		num->sinal = 1; 
+		ungetc(c, stdin); //Devolve o caractere lido ao buffer de entrada }
+	}
+    //Lê cada caractere do número e adiciona à lista
     while (scanf("%c", &c) == 1 && c != '\n') {
-        if (c >= '0' && c <= '9') {
-            adicionarNoFim(num, c - '0');
+        if (c >= '0' && c <= '9') { //Verifica se o caractere é um dígito
+            adicionarNoFim(num, c - '0'); //Adiciona o dígito ao final da lista
         }
     }
 
-    return 0; 
+    return 0; //Retorna 0 indicando sucesso
 }
 
-//Função para remover um nó com o número especificado
+//Função para remover um nó com o número especificado (Usada apenas para debug, não utilizada nas operações)
 void removerNumero(BigNumberStruct* numero, int valor) {
-    BigNumber* temp = numero->head;
-    while (temp != NULL && temp->digito != valor) {
+    BigNumber* temp = numero->head; //Inicia a busca na cabeça da lista
+    while (temp != NULL && temp->digito != valor) { //Procura o nó com o valor desejado
         temp = temp->next;
     }
 
-    if (temp != NULL) {
-        if (temp->prev != NULL) {
+    if (temp != NULL) { //Verifica se o valor foi encontrado
+        if (temp->prev != NULL) { //Atualiza o próximo do nó anterior
             temp->prev->next = temp->next;
-        } else {
-            numero->head = temp->next; 
+        } else { //Se o nó atual era a cabeça, redefine a cabeça
+            numero->head = temp->next;
         }
 
-        if (temp->next != NULL) {
+        if (temp->next != NULL) { //Atualiza o anterior do próximo nó
             temp->next->prev = temp->prev;
         }
 
-        free(temp);  
+        free(temp);//Libera a memória do nó removido
     }
-}
-//Função para encontrar um número específico
-BigNumber* encontrarNumero(BigNumberStruct* numero, int valor) {
-    BigNumber* temp = numero->head;
-    while (temp != NULL && temp->digito != valor) {
-        temp = temp->next;
-    }
-    return temp;
 }
 
-//Função para contar o número de elementos na lista
+//Função para encontrar um número específico (Usada apenas para debug, não utilizada nas operações)
+BigNumber* encontrarNumero(BigNumberStruct* numero, int valor) {
+    
+	BigNumber* temp = numero->head; //Inicia a busca na cabeça da lista
+    
+	while (temp != NULL && temp->digito != valor) { //Procura o nó com o valor desejado
+        temp = temp->next;
+    }
+
+	return temp; //Retorna o ponteiro para o nó encontrado ou NULL
+}
+
+//Função para contar o número de elementos na lista (Usada em algumas operações sendo elas *, / e em outras funçções de apoio)
 int contarElementos(BigNumberStruct* numero) {
-    int contador = 0;
-    BigNumber* temp = numero->head;
-    while (temp != NULL) {
+    
+	int contador = 0;
+    
+	BigNumber* temp = numero->head; // Inicia na cabeça da lista
+    
+	while (temp != NULL) { //Percorre a lista
         contador++;
         temp = temp->next;
     }
-    return contador;
+	
+    return contador; //Retorna o número de nós
 }
 
-//Funçao que compara a magnetudo dos dígitos, ou seja vê qual é maior que o outro.
+//Funçao de apoio que compara a magnetudo dos dígitos, ou seja vê qual é maior que o outro (usada em operações como + e -).
 int comparaBigNumbers(BigNumberStruct* numero1, BigNumberStruct* numero2) {
-    //Compara o número de dígitos(As funções operacionais são úteis);
-    int digitos1 = contarElementos(numero1);
-    int digitos2 = contarElementos(numero2);
+    
+	int digitos1 = contarElementos(numero1); //Conta os dígitos do primeiro número
+    int digitos2 = contarElementos(numero2); //Conta os dígitos do segundo número
 
-    if (digitos1 > digitos2) {
+    if (digitos1 > digitos2) { //Compara o número de dígitos
         return 1;  
     } else if (digitos1 < digitos2) {
         return -1;  
@@ -193,7 +220,7 @@ int comparaBigNumbers(BigNumberStruct* numero1, BigNumberStruct* numero2) {
     BigNumber* temp1 = numero1->head;
     BigNumber* temp2 = numero2->head;
 
-    while (temp1 != NULL) {
+    while (temp1 != NULL) { //Compara os dígitos um a um
         if (temp1->digito > temp2->digito) {
             return 1;  
         } else if (temp1->digito < temp2->digito) {
@@ -203,27 +230,35 @@ int comparaBigNumbers(BigNumberStruct* numero1, BigNumberStruct* numero2) {
         temp2 = temp2->next;
     }
 
-    return 0;
+    return 0; //Retorna 0 se os números são iguais
 }
 
-// Função para remover numeros no inicio
+//Função para remover numeros no inicio (Usada de apoio na função de remover zeros --foi algo que eu resolvi modular para caso fosse usado em outras partes)
 void removerInicio(BigNumberStruct* numero) {
-    if (numero->head == NULL) {
-        return; // Nada a remover
+    
+	if (numero->head == NULL) {
+        return; //Se a lista estiver vazia, não há nada para remover.
     }
-    BigNumber* temp = numero->head;
-    numero->head = numero->head->next;
+
+    BigNumber* temp = numero->head;       //Guarda o nó inicial.
+    numero->head = numero->head->next;    //Atualiza o início da lista para o próximo nó.
+
     if (numero->head != NULL) {
-        numero->head->prev = NULL;
+        numero->head->prev = NULL;        //Remove o link para o nó removido.
     }
-    free(temp);
+
+    free(temp); //Libera a memória do nó removido.
 }
 
-// Função para remover zeros à esquerda
+//Função para remover zeros à esquerda (Usada de apoio para ajeitar os bignumbers)
 void removerZeros(BigNumberStruct* numero) {
+	
+	//Enquanto o primeiro dígito for zero e houver outros dígitos, remove o zero.
     while (numero->head != NULL && numero->head->digito == 0 && numero->head->next != NULL) {
         removerInicio(numero);
     }
+
+    //Se a lista ficar vazia após a remoção, adiciona um único zero para representar o número 0.
     if (numero->head == NULL) {
         adicionarInicio(numero, 0);
     }
@@ -231,48 +266,58 @@ void removerZeros(BigNumberStruct* numero) {
 
 //função usada para fazer um bignumber ficar de trás para frente, para facilitar a multiplicação.
 BigNumberStruct* reverterBigNumber(BigNumberStruct* numero) {
-    BigNumberStruct* numeroInvertido = criarBigNumber();  
+    BigNumberStruct* numeroInvertido = criarBigNumber();  //Cria uma nova estrutura para o número invertido.
     BigNumber* temp = numero->head;
-    
+
+    //Adiciona cada dígito do número original no início do novo número.
     while (temp != NULL) {
-        adicionarInicio(numeroInvertido, temp->digito);  
-        temp = temp->next;  
+        adicionarInicio(numeroInvertido, temp->digito);
+        temp = temp->next;
     }
 
-    numeroInvertido->sinal = numero->sinal;
+    numeroInvertido->sinal = numero->sinal;  //Copia o sinal do número original.
 
-    return numeroInvertido;  
+    return numeroInvertido;  //Retorna a estrutura do número invertido.
 }
 
 //Função para imprimir o BigNumber
 void imprimirNumero(BigNumberStruct* numero) {
-    if (numero == NULL || numero->head == NULL) {
-        printf("Número inválido ou vazio\n");
-        return;
+    
+	if (numero == NULL || numero->head == NULL) {
+        return; //Evita erros se o número for inválido.
     }
 
     if (numero->sinal == -1) {
-        printf("-");
+        printf("-"); //Adiciona o sinal negativo, se necessário.
     }
 
     BigNumber* temp = numero->head;
+
+    //Itera pelos dígitos do número, imprimindo-os em sequência.
     while (temp != NULL) {
         printf("%d", temp->digito);
         temp = temp->next;
     }
-    printf("\n");
+
+    printf("\n"); //Finaliza a impressão.
 }
+
 
 //Função para liberar a memória do BigNumber
 void liberaMemoria(BigNumberStruct* numero) {
-    BigNumber* temp = numero->head;
+    
+	BigNumber* temp = numero->head;
+
+    //Itera por todos os nós da lista, liberando a memória de cada um.
     while (temp != NULL) {
-        BigNumber* proximo = temp->next;
+        BigNumber* proximo = temp->next; //Armazena o próximo nó antes de liberar o atual.
         free(temp);
         temp = proximo;
     }
-    free(numero);
+
+    free(numero); //Libera a memória da estrutura principal.
 }
+
 
 //----------------------------------------------------------------Funções de Operações 
 
@@ -371,18 +416,31 @@ BigNumberStruct* executarOperacao(char operacao, BigNumberStruct* numero1, BigNu
         }
 
 	}
-    
+	
+	//retorna resultado
     return resultado;
 }
 
-//Função para somar dois BigNumberStruct
+/*Função para somar dois BigNumberStruct
+Funcionamento:
+ 1.Compara os sinais dos números. Se forem iguais, procede com a soma direta. Caso contrário, converte o problema em subtração;
+ 2.Move os ponteiros temp1 e temp2 para o final das listas encadeadas dos números;
+ 3.Percorre as listas de trás para frente, somando os dígitos correspondentes e o carry (vai-um);
+ 4.Se algum dos números acabar antes, considera 0 para os dígitos faltantes;
+ 5.Calcula o carry para o próximo dígito;
+ 6.Adiciona cada dígito calculado ao início da lista do resultado;
+ 7.Por fim adiciona o sinal correto. --isso poderia ser retirado devido as mudanças no método operações, mas decidi manter, pois foi algo que achei 
+   resolver as regras de sinais sem antes pensar nas regras para cada grupo.
+*/
 BigNumberStruct* somaBigNumber(BigNumberStruct* numero1, BigNumberStruct* numero2) {
-    //sinais iguais------------------------------
+    
+	// Verifica se os sinais dos números são iguais
     if (numero1->sinal == numero2->sinal) {
-        BigNumberStruct* resultado = criarBigNumber();
-        BigNumber* temp1 = numero1->head;
-        BigNumber* temp2 = numero2->head;
+        BigNumberStruct* resultado = criarBigNumber(); //Cria uma nova estrutura para armazenar o resultado
+        BigNumber* temp1 = numero1->head; //Ponteiro para percorrer os dígitos de numero1
+        BigNumber* temp2 = numero2->head; //Ponteiro para percorrer os dígitos de numero2
 
+        //Move os ponteiros para o final das listas (últimos dígitos)
         while (temp1 != NULL && temp1->next != NULL) {
             temp1 = temp1->next;
         }
@@ -390,36 +448,39 @@ BigNumberStruct* somaBigNumber(BigNumberStruct* numero1, BigNumberStruct* numero
             temp2 = temp2->next;
         }
 
-        int carry = 0; 
+        int carry = 0; //Variável para armazenar o vai-um
         int digito1 = 0, digito2 = 0;
 
+        //Realiza a soma enquanto houver dígitos ou carry pendente
         while (temp1 != NULL || temp2 != NULL || carry != 0) {
-            if (temp1 != NULL) {
+            
+			if (temp1 != NULL) {
                 digito1 = temp1->digito;
-                temp1 = temp1->prev;
+                temp1 = temp1->prev; //Move para o dígito anterior
             }
-
             if (temp2 != NULL) {
                 digito2 = temp2->digito;
-                temp2 = temp2->prev; 
+                temp2 = temp2->prev; //Move para o dígito anterior
             }
 
-            int soma = digito1 + digito2 + carry;
-            carry = soma / 10; 
-            int digitoResultado = soma % 10;  
+            int soma = digito1 + digito2 + carry; //Soma os dígitos e o carry
+            carry = soma / 10; //Calcula o vai-um
+            int digitoResultado = soma % 10; //Calcula o dígito do resultado
 
-            adicionarInicio(resultado, digitoResultado);
+            adicionarInicio(resultado, digitoResultado); //Adiciona o dígito ao início do resultado
 
-            digito1 = 0;
+			//Reseta os dígitos para evitar somas acumuladas
+            digito1 = 0; 
             digito2 = 0;
         }
 
-        resultado->sinal = numero1->sinal;
+        resultado->sinal = numero1->sinal; //O sinal do resultado será igual ao dos números de entrada
         return resultado;
     }
 
-    //sinais diferentes------------------------------
+    //Caso os sinais sejam diferentes
     else {
+        //Determina qual número será subtraído e ajusta o sinal do resultado
         if (comparaBigNumbers(numero1, numero2) >= 0) {
             BigNumberStruct* resultado = subtrairBigNumbers(numero1, numero2);
             resultado->sinal = numero1->sinal;
@@ -432,14 +493,27 @@ BigNumberStruct* somaBigNumber(BigNumberStruct* numero1, BigNumberStruct* numero
     }
 }
 
-//Função para subtrair dois BigNumberStruct
+
+/*Função para subtrair dois BigNumberStruct
+Funcionamento:
+ 1.Compara os números para decidir qual será o maior (minuendo) e qual será o menor (subtraendo);
+ 2.Move os ponteiros para o final das listas dos números;
+ 3.Percorre os dígitos do maior número de trás para frente, subtraindo os dígitos correspondentes do menor
+   Se o resultado de uma subtração for negativo, realiza um "empréstimo" (borrow);
+ 4.Adiciona cada dígito calculado ao início da lista do resultado;
+ 5.Ajusta o sinal do resultado com base na comparação inicial;
+ 6.Remove quaisquer zeros desnecessários no início da lista do resultado;
+ 7.Retorna a estrutura com o número resultante.
+*/
 BigNumberStruct* subtrairBigNumbers(BigNumberStruct* numero1, BigNumberStruct* numero2) {
-    // Garantir que a ordem está correta para evitar resultados negativos inesperados
+    
+	//Compara os números para determinar qual é maior
     int comparacao = comparaBigNumbers(numero1, numero2);
     
     BigNumberStruct* maior;
     BigNumberStruct* menor;
     
+    //Define qual será o número maior e o menor para evitar resultados negativos inesperados
     if (comparacao >= 0) {
         maior = numero1;
         menor = numero2;
@@ -448,10 +522,11 @@ BigNumberStruct* subtrairBigNumbers(BigNumberStruct* numero1, BigNumberStruct* n
         menor = numero1;
     }
 
-    BigNumberStruct* resultado = criarBigNumber();
-    BigNumber* tempMaior = maior->head;
-    BigNumber* tempMenor = menor->head;
+    BigNumberStruct* resultado = criarBigNumber(); //Cria a estrutura para o resultado
+    BigNumber* tempMaior = maior->head; //Ponteiro para percorrer os dígitos do maior número
+    BigNumber* tempMenor = menor->head; //Ponteiro para percorrer os dígitos do menor número
 
+    //Move os ponteiros para o final das listas (últimos dígitos)
     while (tempMaior != NULL && tempMaior->next != NULL) {
         tempMaior = tempMaior->next;
     }
@@ -459,9 +534,10 @@ BigNumberStruct* subtrairBigNumbers(BigNumberStruct* numero1, BigNumberStruct* n
         tempMenor = tempMenor->next;
     }
 
-    int borrow = 0;
+    int borrow = 0; //Variável para controlar o empréstimo
     int digito1 = 0, digito2 = 0;
 
+    //Realiza a subtração enquanto houver dígitos ou empréstimos pendentes
     while (tempMaior != NULL || borrow != 0) {
         if (tempMaior != NULL) {
             digito1 = tempMaior->digito;
@@ -475,21 +551,21 @@ BigNumberStruct* subtrairBigNumbers(BigNumberStruct* numero1, BigNumberStruct* n
             digito2 = 0;
         }
 
-        int subtracao = digito1 - digito2 - borrow;
+        int subtracao = digito1 - digito2 - borrow; //Realiza a subtração considerando o empréstimo
         if (subtracao < 0) {
-            subtracao += 10;
-            borrow = 1;
+            subtracao += 10; //Ajusta o valor se for negativo
+            borrow = 1; //Marca o empréstimo
         } else {
             borrow = 0;
         }
 
-        adicionarInicio(resultado, subtracao);
+        adicionarInicio(resultado, subtracao); //Adiciona o dígito ao início do resultado
 
-        if (tempMaior != NULL) tempMaior = tempMaior->prev;
-        if (tempMenor != NULL) tempMenor = tempMenor->prev;
+        if (tempMaior != NULL) tempMaior = tempMaior->prev; //Move para o dígito anterior
+        if (tempMenor != NULL) tempMenor = tempMenor->prev; //Move para o dígito anterior
     }
 
-    // Definir o sinal do resultado
+    //Define o sinal do resultado baseado na comparação inicial
     if (comparacao >= 0) {
         resultado->sinal = numero1->sinal;
     } else {
@@ -500,93 +576,128 @@ BigNumberStruct* subtrairBigNumbers(BigNumberStruct* numero1, BigNumberStruct* n
         }
     }
 
-    // Remover zeros à esquerda
+    //Remove zeros à esquerda para manter a consistência do número
     removerZeros(resultado);
 
     return resultado;
 }
 
-//Função para multiplicar dois BigNumberStruct
-BigNumberStruct* multiplicarBigNumbers(BigNumberStruct* numero1, BigNumberStruct* numero2) {
-    int tamanho1 = contarElementos(numero1);
-    int tamanho2 = contarElementos(numero2);
-    
-    int resultado_tamanho = tamanho1 + tamanho2;
-    int* resultado = (int*)calloc(resultado_tamanho, sizeof(int));
+/*Função para multiplicar dois BigNumberStruct
+-Essa função para garantir o funcionamento recebe o numero de trás para frente.
+A multiplicação inverte os números antes de realizar a operação porque os dígitos são representados em listas encadeadas e, nesse formato, o início da lista (o "head") 
+corresponde ao primeiro dígito, enquanto o último dígito está no final da lista. Para facilitar os cálculos de multiplicação, que geralmente começam pelos dígitos menos 
+significativos (à direita), é mais eficiente trabalhar diretamente com os números invertidos. 
+Isso evita percorrer as listas repetidamente para acessar os dígitos corretos.
 
-    BigNumber* temp1 = numero1->head;
+Resumindo:
+ Os números são representados como listas encadeadas em ordem natural. logo, invertê-los permite acessar rapidamente os dígitos menos significativos, 
+ necessários para iniciar a multiplicação (de trás para frente). Dessa forma, Após o cálculo, o resultado é reordenado na sequência original para 
+ ser interpretado corretamente.
+
+Exemplo:
+ Suponha que você queira multiplicar 123 por 45. Representando em listas: 
+	Normal: 1 -> 2 -> 3 e 4 -> 5
+	Invertido: 3 -> 2 -> 1 e 5 -> 4
+ Multiplicação com listas invertidas:
+	Multiplica-se 3 × 5, 3 × 4, e assim por diante, acumulando os resultados diretamente no vetor intermediário.
+ Essa abordagem simplifica o código e reduz o número de operações necessárias.
+
+Funcionamento:
+ 1.Determina o tamanho máximo possível do resultado como a soma dos números de dígitos dos dois operandos
+   Aloca memória para armazenar os valores intermediários;
+ 2.Realiza multiplicações cruzadas entre os dígitos dos dois números
+   Adiciona os produtos ao vetor intermediário, levando em conta o vai-um (carry);
+ 3.Remove zeros desnecessários à esquerda no vetor intermediário.
+ 4.Converte o vetor intermediário em uma lista encadeada representando o número final.
+ 5.Retorna a estrutura final.
+*/
+BigNumberStruct* multiplicarBigNumbers(BigNumberStruct* numero1, BigNumberStruct* numero2) {
+    
+	int tamanho1 = contarElementos(numero1); //Obtém o número de dígitos do primeiro número
+    int tamanho2 = contarElementos(numero2); //Obtém o número de dígitos do segundo número
+    
+    int resultado_tamanho = tamanho1 + tamanho2; //Tamanho máximo possível do resultado
+    int* resultado = (int*)calloc(resultado_tamanho, sizeof(int)); //Vetor para armazenar o resultado intermediário
+
+    BigNumber* temp1 = numero1->head; //Ponteiro para percorrer os dígitos do primeiro número
     for (int i = 0; i < tamanho1; i++) {
-        int carry = 0;
-        BigNumber* temp2 = numero2->head;
+        int carry = 0; //Variável para armazenar o vai-um durante a multiplicação
+        BigNumber* temp2 = numero2->head; //Ponteiro para percorrer os dígitos do segundo número
         for (int j = 0; j < tamanho2; j++) {
-            int sum = temp1->digito *  temp2->digito + resultado[i + j] + carry;
-            carry = sum / 10;
-            resultado[i + j] = sum % 10;
-            temp2 = temp2->next;
+            int sum = temp1->digito * temp2->digito + resultado[i + j] + carry; //Multiplica os dígitos e adiciona o valor atual e o carry
+            carry = sum / 10; //Calcula o vai-um
+            resultado[i + j] = sum % 10; //Atualiza o dígito atual
+            temp2 = temp2->next; //Move para o próximo dígito do segundo número
         }
-        resultado[i + tamanho2] += carry;
-        temp1 = temp1->next;
+        resultado[i + tamanho2] += carry; // Adiciona o vai-um ao próximo dígito
+        temp1 = temp1->next; //Move para o próximo dígito do primeiro número
     }
 
-    // Remove zeros à esquerda
+    //Remove zeros à esquerda no resultado final
     while (resultado_tamanho > 1 && resultado[resultado_tamanho - 1] == 0) {
         resultado_tamanho--;
     }
 
-    BigNumberStruct* resultadoStruct = criarBigNumber();
+    BigNumberStruct* resultadoStruct = criarBigNumber(); //Cria a estrutura para o resultado final
     for (int k = resultado_tamanho - 1; k >= 0; k--) {
         if (resultado[k] != 0 || resultadoStruct->head != NULL) {
-            adicionarInicio(resultadoStruct, resultado[k]);
+            adicionarInicio(resultadoStruct, resultado[k]); //Adiciona os dígitos ao resultado final
         }
     }
-    free(resultado);
+    free(resultado); //Libera a memória do vetor intermediário
 
-    return reverterBigNumber(resultadoStruct);
+    return reverterBigNumber(resultadoStruct); //Reverte o número para a ordem correta e retorna
 }
 
-//Função para dividir dois BigNumberStruct com resultado inteiro
+/*Função para dividir dois BigNumberStruct com resultado inteiro
+Funcionamento:
+ 1.Verifica se o divisor é zero e, se for, exibe um erro;
+ 2.Cria estruturas para armazenar o quociente e o resto;
+ 3.Para cada dígito do dividendo:
+   Adiciona o dígito ao resto, remove zeros à esquerda no resto, subtrai repetidamente o divisor do resto enquanto ele for maior ou igual ao divisor, 
+   contando o número de subtrações e adiciona o número de subtrações ao quociente;
+ 4.Adiciona o número de subtrações ao quociente e define o sinal do quociente como positivo se for zero;
+ 5.Libera a memória usada pelo resto e retorna o quociente.
+*/
 BigNumberStruct* dividirBigNumbers(BigNumberStruct* dividendo, BigNumberStruct* divisor) {
-    
-	if (divisor->head == NULL || (contarElementos(divisor) == 1 && divisor->head->digito == 0)) {
+    //Verifica se o divisor é zero, pois divisão por zero não é permitida
+    if (divisor->head == NULL || (contarElementos(divisor) == 1 && divisor->head->digito == 0)) {
         printf("Erro: Divisão por zero.\n");
         return NULL;
     }
 
- 
-    BigNumberStruct* quociente = criarBigNumber();
-    BigNumberStruct* resto = criarBigNumber(); 
+    BigNumberStruct* quociente = criarBigNumber(); //Estrutura para armazenar o quociente
+    BigNumberStruct* resto = criarBigNumber(); //Estrutura para armazenar o resto da divisão
 
-
-    BigNumber* temp = dividendo->head;
+    BigNumber* temp = dividendo->head; //Ponteiro para percorrer os dígitos do dividendo
 
     while (temp != NULL) {
-       
+        //Adiciona o dígito atual ao resto
         adicionarNoFim(resto, temp->digito);
-        removerZeros(resto);
+        removerZeros(resto); //Remove zeros à esquerda no resto
 
-        
+        //Conta quantas vezes o divisor cabe no resto
         int count = 0;
         while (comparaBigNumbers(resto, divisor) >= 0) {
-            BigNumberStruct* subtracao = subtrairBigNumbers(resto, divisor);
-            liberaMemoria(resto);  
-            resto = subtracao;
-            count++;
+            BigNumberStruct* subtracao = subtrairBigNumbers(resto, divisor); //Subtrai o divisor do resto
+            liberaMemoria(resto);  //Libera a memória do resto anterior
+            resto = subtracao; //Atualiza o resto
+            count++; //Incrementa o contador
         }
 
-        adicionarNoFim(quociente, count);
-        temp = temp->next;
+        adicionarNoFim(quociente, count); //Adiciona o valor do contador ao quociente
+        temp = temp->next; //Move para o próximo dígito do dividendo
     }
 
-    removerZeros(quociente);
+    removerZeros(quociente); //Remove zeros à esquerda no quociente
 
-	if (quociente->head == NULL || (quociente->head->digito == 0 && quociente->head->next == NULL)) {
-        // Se o quociente for zero, forçar sinal positivo
+    //Define o sinal do quociente como positivo caso seja zero
+    if (quociente->head == NULL || (quociente->head->digito == 0 && quociente->head->next == NULL)) {
         quociente->sinal = 1;
     }
 
-    liberaMemoria(resto);
+    liberaMemoria(resto); //Libera a memória do resto
 
-    return quociente;
+    return quociente; //Retorna o quociente
 }
-
 
