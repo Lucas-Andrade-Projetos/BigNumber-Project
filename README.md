@@ -107,13 +107,12 @@ A função `somaBigNumber` é projetada para realizar a soma de dois números gr
 
 A função `subtrairBigNumbers` é projetada para realizar a subtração de dois números grandes que podem incluir valores positivos ou negativos. Aqui está uma explicação passo a passo do fluxo da função:
 
-## 1. Parâmetros de Entrada
+1. **Parâmetros de Entrada
 
 - **`BigNumberStruct* numero1`**: Primeiro número grande.
 - **`BigNumberStruct* numero2`**: Segundo número grande.
 
-## 2. Comparação de Números
-
+2. **Comparação de Números
 A função chama `comparaBigNumbers(numero1, numero2)` para comparar os dois números e determinar qual é o maior.
 
 - **Se `numero1` é maior ou igual a `numero2` (comparacao >= 0)**:
@@ -122,16 +121,16 @@ A função chama `comparaBigNumbers(numero1, numero2)` para comparar os dois nú
 - **Se `numero2` é maior que `numero1` (comparacao < 0)**:
   - `numero2` será considerado o maior e `numero1` o menor.
 
-## 3. Inicialização do Resultado
+3. **Inicialização do Resultado
 
 - Cria-se uma nova estrutura `BigNumberStruct* resultado` para armazenar o resultado da subtração.
 - Ponteiros `tempMaior` e `tempMenor` são usados para percorrer os dígitos de maior e menor respectivamente, começando do último dígito.
 
-## 4. Movimento dos Ponteiros para o Final das Listas
+4. **Movimento dos Ponteiros para o Final das Listas
 
 - Ambos os ponteiros, `tempMaior` e `tempMenor`, são movidos para o final das listas (últimos dígitos), para facilitar a subtração a partir do final.
 
-## 5. Subtração dos Dígitos
+5. **Subtração dos Dígitos
 
 - Variáveis auxiliares `borrow` (para empréstimo), `digito1` (do maior número) e `digito2` (do menor número) são usadas para controlar a subtração.
 
@@ -151,7 +150,7 @@ Para cada dígito:
 
 Após cada operação, os ponteiros `tempMaior` e `tempMenor` são movidos para os dígitos anteriores.
 
-## 6. Definição do Sinal do Resultado
+6. **Definição do Sinal do Resultado
 
 O sinal de resultado é definido com base na comparação inicial entre os números:
 
@@ -162,11 +161,11 @@ O sinal de resultado é definido com base na comparação inicial entre os núme
   - Se `numero2` for positivo (`numero2->sinal == 1`), o sinal de resultado será negativo;
   - Caso contrário, o sinal de resultado será positivo.
 
-## 7. Remoção de Zeros à Esquerda
+7. **Remoção de Zeros à Esquerda
 
 Após calcular a subtração, `removerZeros(resultado)` é chamada para remover qualquer zero à esquerda do número, garantindo que o formato do número esteja correto.
 
-## 8. Retorno do Resultado
+8. **Retorno do Resultado
 
 A função retorna o `BigNumberStruct* resultado`, que contém:
 
@@ -179,22 +178,22 @@ A função retorna o `BigNumberStruct* resultado`, que contém:
 
 A função `multiplicarBigNumbers` é projetada para realizar a multiplicação de dois números grandes que podem incluir valores positivos ou negativos. Aqui está uma explicação passo a passo do fluxo da função:
 
-## 1. Parâmetros de Entrada
+1. **Parâmetros de Entrada
 
 - **`BigNumberStruct* numero1`**: Primeiro número grande.
 - **`BigNumberStruct* numero2`**: Segundo número grande.
 
-## 2. Cálculo do Tamanho dos Números de Entrada
+2. **Cálculo do Tamanho dos Números de Entrada
 
 - A função começa obtendo o número de dígitos de `numero1` e `numero2` usando a função `contarElementos(numero1)` e `contarElementos(numero2)`, respectivamente.
 - `tamanho1` é o número de dígitos de `numero1`, e `tamanho2` é o número de dígitos de `numero2`.
 
-## 3. Alocação do Vetor de Resultado
+3. **Alocação do Vetor de Resultado
 
 - O tamanho máximo do resultado da multiplicação é `tamanho1 + tamanho2`, pois a multiplicação de dois números com `m` e `n` dígitos pode resultar em um número com até `m + n` dígitos.
 - Um vetor de `int` chamado `resultado` é alocado com tamanho `resultado_tamanho`, e inicializado com zeros.
 
-## 4. Multiplicação dos Dígitos dos Números
+4. **Multiplicação dos Dígitos dos Números
 
 - A função usa dois ponteiros `temp1` e `temp2` para percorrer os dígitos de `numero1` e `numero2`, respectivamente.
 - A multiplicação é feita de forma semelhante à multiplicação manual:
@@ -214,26 +213,26 @@ A função `multiplicarBigNumbers` é projetada para realizar a multiplicação 
 - Após o segundo loop, o carry (vai-um) é adicionado ao próximo dígito de `resultado[i + tamanho2]`;
 - O ponteiro `temp1` é movido para o próximo dígito de `numero1`.
 
-## 5. Remoção de Zeros à Esquerda no Vetor de Resultado
+5. **Remoção de Zeros à Esquerda no Vetor de Resultado
 
 - Após a multiplicação de todos os dígitos, a função remove os zeros à esquerda no vetor `resultado`. Isso é feito verificando se o último dígito do vetor é zero e ajustando o tamanho do resultado.
 
-## 6. Criação da Estrutura para o Resultado Final
+6. **Criação da Estrutura para o Resultado Final
 
 - A função cria uma nova estrutura `BigNumberStruct* resultadoStruct` para armazenar o resultado da multiplicação.
 - A função percorre o vetor `resultado` de trás para frente (do último dígito para o primeiro) e adiciona cada dígito à estrutura `resultadoStruct` usando a função `adicionarInicio(resultadoStruct, resultado[k])`.
 - A adição é feita do final para o início para garantir que a ordem dos dígitos seja correta.
 
-## 7. Liberação da Memória do Vetor Intermediário
+7. **Liberação da Memória do Vetor Intermediário
 
 - Após transferir os dígitos para a estrutura `resultadoStruct`, o vetor `resultado` é liberado usando `free(resultado)`.
 
-## 8. Reversão do Número e Retorno
+8. **Reversão do Número e Retorno
 
 - Finalmente, a função chama `reverterBigNumber(resultadoStruct)` para garantir que o número esteja na ordem correta (caso contrário, os dígitos seriam armazenados em ordem invertida);
 - O resultado final é retornado.
 
-## 9. Retorno do Resultado
+9. **Retorno do Resultado
 
 A função retorna o `BigNumberStruct* resultado`, que contém:
 
@@ -246,26 +245,26 @@ A função retorna o `BigNumberStruct* resultado`, que contém:
 
 A função `dividirBigNumbers` é projetada para realizar a divisão de dois números grandes que podem incluir valores positivos ou negativos. Aqui está uma explicação passo a passo do fluxo da função:
 
-## 1. Parâmetros de Entrada
+1. **Parâmetros de Entrada
 
 - **`BigNumberStruct* dividendo`**: O número que será dividido.
 - **`BigNumberStruct* divisor`**: O número que dividirá o dividendo.
 
-## 2. Verificação de Divisão por Zero
+2. **Verificação de Divisão por Zero
 
 - A função começa verificando se o divisor é zero.
 - Se o divisor for zero (ou seja, se o primeiro dígito do divisor for 0 ou se a lista estiver vazia), a função imprime uma mensagem de erro e retorna `NULL` para indicar que a divisão não pode ser realizada.
 
-## 3. Criação das Estruturas para o Quociente e Resto
+3. **Criação das Estruturas para o Quociente e Resto
 
 - **`BigNumberStruct* quociente`**: Uma nova estrutura é criada para armazenar o quociente da divisão.
 - **`BigNumberStruct* resto`**: Uma nova estrutura é criada para armazenar o resto da divisão.
 
-## 4. Inicialização do Ponteiro para o Dividendo
+4. **Inicialização do Ponteiro para o Dividendo
 
 - Um ponteiro `temp` é inicializado apontando para o primeiro dígito do dividendo.
 
-## 5. Laço de Divisão
+5. **Laço de Divisão
 
 ### Adição do Dígito ao Resto
 
@@ -286,19 +285,19 @@ A função `dividirBigNumbers` é projetada para realizar a divisão de dois nú
 
 - O ponteiro `temp` é movido para o próximo dígito do dividendo (i.e., `temp = temp->next`).
 
-## 6. Remoção de Zeros à Esquerda no Quociente
+6. **Remoção de Zeros à Esquerda no Quociente
 
 - Após o laço, `removerZeros(quociente)` é chamado para remover zeros à esquerda no quociente, garantindo que o número esteja no formato correto.
 
-## 7. Definição do Sinal do Quociente
+7. **Definição do Sinal do Quociente
 
 - Se o quociente for zero (ou seja, se ele não contiver nenhum dígito ou tiver apenas um dígito zero), o sinal do quociente é definido como positivo.
 
-## 8. Liberação da Memória do Resto
+8. **Liberação da Memória do Resto
 
 - A memória usada pelo resto é liberada com a função `liberaMemoria(resto)`.
 
-## 9. Retorno do Resultado
+9. **Retorno do Resultado
 
 A função retorna `BigNumberStruct* quociente`, que contém:
 
