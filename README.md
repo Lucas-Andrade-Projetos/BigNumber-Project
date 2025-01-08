@@ -174,127 +174,132 @@ A função retorna o `BigNumberStruct* resultado`, que contém:
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-### Função `BigNumberStruct* multiplicarBigNumbers(BigNumberStruct* numero1, BigNumberStruct* numero2)`
+### Função BigNumberStruct* multiplicarBigNumbers(BigNumberStruct* numero1, BigNumberStruct* numero2)
 
-A função `multiplicarBigNumbers` é projetada para realizar a multiplicação de dois números grandes, que podem ser positivos ou negativos. A seguir, explicamos o fluxo da função:
+A função multiplicarBigNumbers é projetada para realizar a multiplicação de dois números grandes que podem incluir valores positivos ou negativos. Aqui está uma explicação passo a passo do fluxo da função:
 
-## Parâmetros de Entrada
+1. **Parâmetros de Entrada
 
-- **`BigNumberStruct* numero1`**: O primeiro número grande.
-- **`BigNumberStruct* numero2`**: O segundo número grande.
+- **BigNumberStruct* numero1**: Primeiro número grande.
+- **BigNumberStruct* numero2**: Segundo número grande.
 
-## Cálculo do Tamanho dos Números de Entrada
+2. **Cálculo do Tamanho dos Números de Entrada
 
-- A função começa obtendo o número de dígitos de `numero1` e `numero2` usando a função `contarElementos(numero1)` e `contarElementos(numero2)`, respectivamente.
-- `tamanho1` é o número de dígitos de `numero1`, e `tamanho2` é o número de dígitos de `numero2`.
+- A função começa obtendo o número de dígitos de numero1 e numero2 usando a função contarElementos(numero1) e contarElementos(numero2), respectivamente.
+- tamanho1 é o número de dígitos de numero1, e tamanho2 é o número de dígitos de numero2.
 
-## Alocação do Vetor de Resultado
+3. **Alocação do Vetor de Resultado
 
-- O tamanho máximo do resultado da multiplicação é `tamanho1 + tamanho2`, pois a multiplicação de dois números com `m` e `n` dígitos pode resultar em um número com até `m + n` dígitos.
-- Um vetor de `int` chamado `resultado` é alocado com tamanho `resultado_tamanho` e inicializado com zeros.
+- O tamanho máximo do resultado da multiplicação é tamanho1 + tamanho2, pois a multiplicação de dois números com m e n dígitos pode resultar em um número com até m + n dígitos.
+- Um vetor de int chamado resultado é alocado com tamanho resultado_tamanho, e inicializado com zeros.
 
-## Multiplicação dos Dígitos dos Números
+4. **Multiplicação dos Dígitos dos Números
 
-A multiplicação é feita de forma semelhante à multiplicação manual:
+- A função usa dois ponteiros temp1 e temp2 para percorrer os dígitos de numero1 e numero2, respectivamente.
+- A multiplicação é feita de forma semelhante à multiplicação manual:
 
-1. **Primeiro Loop**: Percorre os Dígitos de `numero1`.
-2. **Segundo Loop**: Percorre os Dígitos de `numero2`.
+### Primeiro Loop: Percorre os Dígitos de numero1
 
-### Multiplicação e Soma
+### Segundo Loop: Percorre os Dígitos de numero2
 
-- Multiplica o dígito atual de `numero1` (`temp1->digito`) pelo dígito atual de `numero2` (`temp2->digito`).
-- Adiciona o resultado da multiplicação ao valor no vetor `resultado[i + j]`, juntamente com o carry (vai-um) do cálculo anterior.
-- O carry é calculado como a parte inteira da divisão por 10 (vai-um) e armazenado.
-- O dígito atual de `resultado[i + j]` é atualizado com o valor da multiplicação módulo 10.
-- O ponteiro `temp2` é movido para o próximo dígito de `numero2`.
-- Após o segundo loop, o carry (vai-um) é adicionado ao próximo dígito de `resultado[i + tamanho2]`.
-- O ponteiro `temp1` é movido para o próximo dígito de `numero1`.
+#### Multiplicação e Soma:
 
-## Remoção de Zeros à Esquerda no Vetor de Resultado
+- Multiplica o dígito atual de numero1 (temp1->digito) pelo dígito atual de numero2 (temp2->digito);
+- Adiciona o resultado da multiplicação, o valor no vetor resultado[i + j], e o carry (vai-um) do cálculo anterior;
+- O carry é calculado como a parte inteira da divisão por 10 (vai-um) e armazenado;
+- O dígito atual de resultado[i + j] é atualizado com o valor da multiplicação módulo 10;
+- O ponteiro temp2 é movido para o próximo dígito de numero2;
 
-- Após a multiplicação de todos os dígitos, a função remove os zeros à esquerda no vetor `resultado`. Isso é feito verificando se o último dígito do vetor é zero e ajustando o tamanho do resultado.
+- Após o segundo loop, o carry (vai-um) é adicionado ao próximo dígito de resultado[i + tamanho2];
+- O ponteiro temp1 é movido para o próximo dígito de numero1.
 
-## Criação da Estrutura para o Resultado Final
+5. **Remoção de Zeros à Esquerda no Vetor de Resultado
 
-- A função cria uma nova estrutura `BigNumberStruct* resultadoStruct` para armazenar o resultado da multiplicação.
-- A função percorre o vetor `resultado` de trás para frente (do último dígito para o primeiro) e adiciona cada dígito à estrutura `resultadoStruct` usando a função `adicionarInicio(resultadoStruct, resultado[k])`.
+- Após a multiplicação de todos os dígitos, a função remove os zeros à esquerda no vetor resultado. Isso é feito verificando se o último dígito do vetor é zero e ajustando o tamanho do resultado.
 
-## Liberação da Memória do Vetor Intermediário
+6. **Criação da Estrutura para o Resultado Final
 
-- Após transferir os dígitos para a estrutura `resultadoStruct`, o vetor `resultado` é liberado usando `free(resultado)`.
+- A função cria uma nova estrutura BigNumberStruct* resultadoStruct para armazenar o resultado da multiplicação.
+- A função percorre o vetor resultado de trás para frente (do último dígito para o primeiro) e adiciona cada dígito à estrutura resultadoStruct usando a função adicionarInicio(resultadoStruct, resultado[k]).
+- A adição é feita do final para o início para garantir que a ordem dos dígitos seja correta.
 
-## Reversão do Número e Retorno
+7. **Liberação da Memória do Vetor Intermediário
 
-- Finalmente, a função chama `reverterBigNumber(resultadoStruct)` para garantir que o número esteja na ordem correta (caso contrário, os dígitos seriam armazenados em ordem invertida).
+- Após transferir os dígitos para a estrutura resultadoStruct, o vetor resultado é liberado usando free(resultado).
+
+8. **Reversão do Número e Retorno
+
+- Finalmente, a função chama reverterBigNumber(resultadoStruct) para garantir que o número esteja na ordem correta (caso contrário, os dígitos seriam armazenados em ordem invertida);
 - O resultado final é retornado.
 
-## Retorno do Resultado
+9. **Retorno do Resultado
 
-A função retorna o `BigNumberStruct* resultado`, que contém:
+A função retorna o BigNumberStruct* resultado, que contém:
 
-- A lista de dígitos representando o número calculado (a multiplicação de `numero1` e `numero2`).
-- O sinal do resultado, que pode ser determinado com base na multiplicação dos sinais dos números de entrada.
+- A lista de dígitos representando o número calculado (a multiplicação de numero1 e numero2);
+- O sinal do resultado, que pode ser determinado com base na multiplicação de sinais dos números de entrada.
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-### Função `BigNumberStruct* dividirBigNumbers(BigNumberStruct* dividendo, BigNumberStruct* divisor)`
+### Função BigNumberStruct* dividirBigNumbers(BigNumberStruct* dividendo, BigNumberStruct* divisor)
 
-A função `dividirBigNumbers` realiza a divisão de dois números grandes, que podem ser positivos ou negativos. A seguir, explicamos o fluxo da função:
+A função dividirBigNumbers é projetada para realizar a divisão de dois números grandes que podem incluir valores positivos ou negativos. Aqui está uma explicação passo a passo do fluxo da função:
 
-## Parâmetros de Entrada
+1. **Parâmetros de Entrada
 
-- **`BigNumberStruct* dividendo`**: O número que será dividido.
-- **`BigNumberStruct* divisor`**: O número que dividirá o dividendo.
+- **BigNumberStruct* dividendo**: O número que será dividido.
+- **BigNumberStruct* divisor**: O número que dividirá o dividendo.
 
-## Verificação de Divisão por Zero
+2. **Verificação de Divisão por Zero
 
-- A função começa verificando se o divisor é zero. Se o divisor for zero (ou seja, se o primeiro dígito do divisor for 0 ou se a lista estiver vazia), a função imprime uma mensagem de erro e retorna `NULL` para indicar que a divisão não pode ser realizada.
+- A função começa verificando se o divisor é zero.
+- Se o divisor for zero (ou seja, se o primeiro dígito do divisor for 0 ou se a lista estiver vazia), a função imprime uma mensagem de erro e retorna NULL para indicar que a divisão não pode ser realizada.
 
-## Criação das Estruturas para o Quociente e Resto
+3. **Criação das Estruturas para o Quociente e Resto
 
-- **`BigNumberStruct* quociente`**: Uma nova estrutura é criada para armazenar o quociente da divisão.
-- **`BigNumberStruct* resto`**: Uma nova estrutura é criada para armazenar o resto da divisão.
+- **BigNumberStruct* quociente**: Uma nova estrutura é criada para armazenar o quociente da divisão.
+- **BigNumberStruct* resto**: Uma nova estrutura é criada para armazenar o resto da divisão.
 
-## Inicialização do Ponteiro para o Dividendo
+4. **Inicialização do Ponteiro para o Dividendo
 
-- Um ponteiro `temp` é inicializado apontando para o primeiro dígito do dividendo.
+- Um ponteiro temp é inicializado apontando para o primeiro dígito do dividendo.
 
-## Laço de Divisão
+5. **Laço de Divisão
 
 ### Adição do Dígito ao Resto
 
-- O dígito atual de `temp` (do dividendo) é adicionado ao resto usando a função `adicionarNoFim(resto, temp->digito)`.
-- Em seguida, os zeros à esquerda são removidos no resto usando a função `removerZeros(resto)`.
+- O dígito atual de temp (do dividendo) é adicionado ao resto usando a função adicionarNoFim(resto, temp->digito).
+- Em seguida, os zeros à esquerda são removidos no resto usando a função removerZeros(resto).
 
 ### Contagem de Quantas Vezes o Divisor Cabe no Resto
 
-- A função entra em um laço `while (comparaBigNumbers(resto, divisor) >= 0)`, que verifica se o resto é maior ou igual ao divisor.
-- Enquanto o divisor couber no resto, o divisor é subtraído do resto usando a função `subtrairBigNumbers(resto, divisor)`. O resto é atualizado com o resultado da subtração.
-- O contador `count` é incrementado a cada subtração, contando quantas vezes o divisor cabe no resto.
+- A função entra em um laço while (comparaBigNumbers(resto, divisor) >= 0), que verifica se o resto é maior ou igual ao divisor.
+- Enquanto o divisor couber no resto, o divisor é subtraído do resto usando a função subtrairBigNumbers(resto, divisor). O resto é atualizado com o resultado da subtração.
+- O contador count é incrementado a cada subtração, contando quantas vezes o divisor cabe no resto.
 
 ### Adição do Resultado ao Quociente
 
-- O valor do contador `count` (que representa o número de vezes que o divisor coube no resto) é adicionado ao quociente usando `adicionarNoFim(quociente, count)`.
+- O valor do contador count (que representa o número de vezes que o divisor coube no resto) é adicionado ao quociente usando adicionarNoFim(quociente, count).
 
 ### Movimento para o Próximo Dígito do Dividendo
 
-- O ponteiro `temp` é movido para o próximo dígito do dividendo (i.e., `temp = temp->next`).
+- O ponteiro temp é movido para o próximo dígito do dividendo (i.e., temp = temp->next).
 
-## Remoção de Zeros à Esquerda no Quociente
+6. **Remoção de Zeros à Esquerda no Quociente
 
-- Após o laço, `removerZeros(quociente)` é chamado para remover zeros à esquerda no quociente, garantindo que o número esteja no formato correto.
+- Após o laço, removerZeros(quociente) é chamado para remover zeros à esquerda no quociente, garantindo que o número esteja no formato correto.
 
-## Definição do Sinal do Quociente
+7. **Definição do Sinal do Quociente
 
 - Se o quociente for zero (ou seja, se ele não contiver nenhum dígito ou tiver apenas um dígito zero), o sinal do quociente é definido como positivo.
 
-## Liberação da Memória do Resto
+8. **Liberação da Memória do Resto
 
-- A memória usada pelo resto é liberada com a função `liberaMemoria(resto)`.
+- A memória usada pelo resto é liberada com a função liberaMemoria(resto).
 
-## Retorno do Resultado
+9. **Retorno do Resultado
 
-A função retorna `BigNumberStruct* quociente`, que contém:
+A função retorna BigNumberStruct* quociente, que contém:
 
 - A lista de dígitos representando o quociente da divisão.
 - O sinal do quociente, que será ajustado dependendo do resultado da divisão (caso o quociente seja zero, o sinal será ajustado como positivo).
