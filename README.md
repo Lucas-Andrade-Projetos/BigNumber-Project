@@ -175,7 +175,7 @@ A função retorna o `BigNumberStruct* resultado`, que contém:
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-# Função `BigNumberStruct* multiplicarBigNumbers(BigNumberStruct* numero1, BigNumberStruct* numero2)`
+### Função `BigNumberStruct* multiplicarBigNumbers(BigNumberStruct* numero1, BigNumberStruct* numero2)`
 
 A função `multiplicarBigNumbers` é projetada para realizar a multiplicação de dois números grandes que podem incluir valores positivos ou negativos. Aqui está uma explicação passo a passo do fluxo da função:
 
@@ -242,7 +242,7 @@ A função retorna o `BigNumberStruct* resultado`, que contém:
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-# Função `BigNumberStruct* dividirBigNumbers(BigNumberStruct* dividendo, BigNumberStruct* divisor)`
+### Função `BigNumberStruct* dividirBigNumbers(BigNumberStruct* dividendo, BigNumberStruct* divisor)`
 
 A função `dividirBigNumbers` é projetada para realizar a divisão de dois números grandes que podem incluir valores positivos ou negativos. Aqui está uma explicação passo a passo do fluxo da função:
 
