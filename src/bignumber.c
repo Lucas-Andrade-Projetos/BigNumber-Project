@@ -233,6 +233,25 @@ int comparaBigNumbers(BigNumberStruct* numero1, BigNumberStruct* numero2) {
     return 0; //Retorna 0 se os números são iguais
 }
 
+//Função que verifica se o bignumber é impar ou par.
+int isImpar(BigNumberStruct* numero) {
+    if (numero == NULL || numero->head == NULL) {
+        return 0; //Considera zero como par
+    }
+
+    BigNumber* temp = numero->head;
+    while (temp->next != NULL) {
+        temp = temp->next;
+    }
+
+    //Verifica o último dígito
+    if (temp->digito % 2 != 0) {
+        return 1; //Ímpar
+    } else {
+        return 0; //Par
+    }
+}
+
 //Função para remover numeros no inicio (Usada de apoio na função de remover zeros --foi algo que eu resolvi modular para caso fosse usado em outras partes)
 void removerInicio(BigNumberStruct* numero) {
     
@@ -280,6 +299,8 @@ BigNumberStruct* reverterBigNumber(BigNumberStruct* numero) {
     return numeroInvertido;  //Retorna a estrutura do número invertido.
 }
 
+
+
 //Função para imprimir o BigNumber
 void imprimirNumero(BigNumberStruct* numero) {
     
@@ -298,6 +319,7 @@ void imprimirNumero(BigNumberStruct* numero) {
         printf("%d", temp->digito);
         temp = temp->next;
     }
+
 
     printf("\n"); //Finaliza a impressão.
 }
@@ -416,7 +438,32 @@ BigNumberStruct* executarOperacao(char operacao, BigNumberStruct* numero1, BigNu
         }
 
 	}
-	
+	if(operacao == '%'){
+        resultado = restoBigNumber(numero1, numero2);
+	}
+	if (operacao == '^') {
+    	if (numero1->sinal == 1 && numero2->sinal == 1) {
+        	// Ambos os números são positivos
+        	resultado = expRapida(numero1, numero2);
+    	} else if (numero1->sinal == -1 && numero2->sinal == 1) {
+        	// Base negativa e expoente positivo
+        	// Verificar a paridade do expoente
+        	if (!isImpar(numero2)) {
+            	// Expoente par
+            	numero1->sinal = 1; 
+           		numero2->sinal = 1; 
+            	resultado = expRapida(numero1, numero2);
+            	resultado->sinal = 1;  // Resultado positivo
+        	} else {
+            	// Expoente ímpar
+            	numero1->sinal = 1; 
+            	numero2->sinal = 1; 
+            	resultado = expRapida(numero1, numero2);
+            	resultado->sinal = -1;// Resultado negativo
+        	}
+    	}
+	}
+
 	//retorna resultado
     return resultado;
 }
@@ -700,4 +747,134 @@ BigNumberStruct* dividirBigNumbers(BigNumberStruct* dividendo, BigNumberStruct* 
 
     return quociente; //Retorna o quociente
 }
+
+/*Função para calcular o resto da divisão
+Funcionamento:
+ 1.Inicializa resto e dividendo;
+ 2.Copia os dígitos de numero1 para dividendo;
+ 3.Subtrai repetidamente divisor de dividendo enquanto este for maior ou igual ao divisor;
+ 4.O que sobra em dividendo é copiado para resto;
+ 5.Libera a memória usada para o cálculo intermediário e retorna o resto.
+*/
+BigNumberStruct* restoBigNumber(BigNumberStruct* numero1, BigNumberStruct* divisor) {
+    //Cria um BigNumberStruct para armazenar o resultado do resto
+    BigNumberStruct* resto = criarBigNumber();
+
+    //Cria uma cópia de numero1 que será usada para o cálculo da divisão
+    BigNumberStruct* dividendo = criarBigNumber();
+
+    //Copiar os números de numero1 para dividendo
+    BigNumber* temp = numero1->head;
+    while (temp != NULL) {
+        adicionarNoFim(dividendo, temp->digito);
+        temp = temp->next;
+    }
+
+    //Subtrai o divisor do dividendo até que o dividendo seja menor que o divisor
+    int iteracao = 0;
+    while (comparaBigNumbers(dividendo, divisor) >= 0) {
+        BigNumberStruct* tempDividendo = subtrairBigNumbers(dividendo, divisor);
+        liberaMemoria(dividendo); //Libera a memória do dividendo anterior
+        dividendo = tempDividendo; //Atualiza o dividendo com o resultado da subtração
+        iteracao++;
+    }
+
+    //O que sobrar no dividendo é o resto
+    temp = dividendo->head;
+    while (temp != NULL) {
+        adicionarNoFim(resto, temp->digito);
+        temp = temp->next;
+    }
+
+    //Libera a memória usada pelo dividendo
+    liberaMemoria(dividendo);
+
+    //Retorna o resto calculado
+    return resto;
+}
+
+/*Função para calcular exponenciação rapida
+Funcionamento:
+ 1.Trata o caso base (exp = 0) e retorna 1;
+ 2.Inicializa resultado como 1, baseAtual como uma cópia de base, e cria zero e dois para operações;
+ 3.Entra no loop principal:
+	-Se exp for ímpar, atualiza resultado multiplicando-o por baseAtual;
+	-Atualiza baseAtual calculando seu quadrado;
+	-Atualiza exp dividindo-o por 2.
+ 4.Após o loop, libera a memória auxiliar e retorna o resultado final.
+*/
+BigNumberStruct* expRapida(BigNumberStruct* base, BigNumberStruct* exp) {
+    // Caso base: base^0 = 1
+    if (exp->head->digito == 0 && exp->head->next == NULL) {
+        return criarBigNumberDeNumero(1);
+    }
+
+    // Inicializa resultado como 1
+    BigNumberStruct* resultado = criarBigNumberDeNumero(1);
+
+    // Copia a base para baseAtual
+    BigNumberStruct* baseAtual = criarBigNumber();
+    BigNumber* temp = base->head;
+    while (temp != NULL) {
+        adicionarNoFim(baseAtual, temp->digito);
+        temp = temp->next;
+    }
+
+    // Declarações para zero e dois
+    BigNumberStruct* zero = criarBigNumberDeNumero(0);
+    BigNumberStruct* dois = criarBigNumberDeNumero(2);
+
+    // Loop principal para cálculo da exponenciação rápida
+    while (comparaBigNumbers(exp, zero) > 0) {
+        BigNumberStruct* resto = restoBigNumber(exp, dois);
+
+        if (resto->head->digito == 1 && resto->head->next == NULL) { // Se o expoente for ímpar
+            BigNumberStruct* tempResultado = multiplicarBigNumbers(reverterBigNumber(resultado), reverterBigNumber(baseAtual));
+            liberaMemoria(resultado);
+            resultado = tempResultado;
+        }
+
+        // Atualiza baseAtual (baseAtual = baseAtual^2)
+        BigNumberStruct* tempBase = multiplicarBigNumbers(reverterBigNumber(baseAtual), reverterBigNumber(baseAtual));
+        liberaMemoria(baseAtual);
+        baseAtual = tempBase;
+
+        // Atualiza exp (exp = exp / 2)
+        BigNumberStruct* tempExp = dividirBigNumbers(exp, dois);
+        liberaMemoria(exp);
+        exp = tempExp;
+
+        liberaMemoria(resto);
+    }
+
+    // Libera os BigNumbers auxiliares
+    liberaMemoria(baseAtual);
+    liberaMemoria(zero);
+    liberaMemoria(dois);
+
+    return resultado;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
