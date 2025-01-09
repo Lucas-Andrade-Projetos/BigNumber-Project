@@ -5,7 +5,7 @@
 *Todo o trabalho foi feito por mim, então todas as divisões como testes, organização e desenvolvimento foram realizadas por uma pessoa.*
 
 ## Descrição
-O **BigNumber Project** é uma implementação de um tipo de dado que representa números inteiros extremamente grandes, utilizando uma lista duplamente encadeada para armazenar seus dígitos. O objetivo do projeto é criar uma estrutura de dados capaz de realizar operações aritméticas básicas (+, -, ×, ÷) em números inteiros de qualquer tamanho, sem perder precisão.  
+O **BigNumber Project** é uma implementação de um tipo de dado que representa números inteiros extremamente grandes, utilizando uma lista duplamente encadeada para armazenar seus dígitos. O objetivo do projeto é criar uma estrutura de dados capaz de realizar operações aritméticas básicas (+, -, ×, ÷) em números inteiros de qualquer tamanho, sem perder precisão e alguns extras como resto da divisão e exponenciação(%, ^).  
 Este projeto foi desenvolvido para lidar com números tão grandes quanto a memória do computador permitir, com foco em aplicabilidade em áreas como criptografia, simulações de grandes dados e outros campos que necessitam de manipulação precisa de grandes números inteiros.
 
 ## Explicação da Organização do Código
@@ -17,17 +17,17 @@ O código foi organizado em módulos separados para garantir a clareza e manuten
 - **makefile**: Arquivo de configuração para a construção e compilação do projeto utilizando o comando `make`.
 
 ## Funcionamento
-O funcionamento se resume à entrada dos dados, sendo dois BigNumbers e uma operação ( + , - , * , / ). Em seguida, o método `executar_operacao` é chamado para realizar a regra de sinais e chamar a operação correta para cada passo.
+O funcionamento se resume à entrada dos dados, sendo dois BigNumbers e uma operação ( + , - , * , /, %, ^). Em seguida, o método `executar_operacao` é chamado para realizar a regra de sinais e chamar a operação correta para cada passo.
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ## Guia de funções e funcionamento:
 
 ### Função `BigNumberStruct* executarOperacao(char operacao, BigNumberStruct* numero1, BigNumberStruct* numero2)`
-A função `executarOperacao` é projetada para realizar operações matemáticas ( + , - , * , / ) entre dois números grandes (`BigNumberStruct`) que podem incluir valores positivos ou negativos. Aqui está uma explicação passo a passo do fluxo da função:
+A função `executarOperacao` é projetada para realizar operações matemáticas ( + , - , * , /, %, ^) entre dois números grandes (`BigNumberStruct`) que podem incluir valores positivos ou negativos. Aqui está uma explicação passo a passo do fluxo da função:
 
 1. **Parâmetros de entrada**
-   - `char operacao`: Indica qual operação matemática será executada ( + , - , * , / ).
+   - `char operacao`: Indica qual operação matemática será executada ( + , - , * , /, %, ^).
    - `BigNumberStruct* numero1`: Primeiro número grande.
    - `BigNumberStruct* numero2`: Segundo número grande.
 
@@ -58,7 +58,15 @@ A função `executarOperacao` é projetada para realizar operações matemática
    - **numero1 negativo, numero2 positivo**: Converte `numero1` para positivo temporariamente. Realiza a divisão. Define o sinal como negativo, caso o resultado não seja zero.
    - **Ambos negativos**: Ambos os números são convertidos para positivos temporariamente. Realiza a divisão. O resultado permanece positivo.
 
-7. **Retorno do resultado**
+7. **Operação de resto ( % )**
+   - **O resultado é sempre positivo**: Chama `restoBigNumber` diretamente e retorna o valor esperado.
+
+8. **Operação de divisão ( ^ )**
+   - **Ambos positivos**: Chama `expRapida` diretamente.
+   - **numero1 negativo, numero2 positivo entretanto com valor ímpar **: Converte ambos numeros para positivo e realiza o calculo setando por final o número como negativo;
+   - **numero1 negativo, numero2 positivo entretanto com valor par **: Converte ambos numeros para positivo e realiza o calculo setando por final o número como positivo;
+
+9. **Retorno do resultado**
    Após realizar a operação apropriada, o `BigNumberStruct* resultado` é retornado, contendo:
    - A lista de dígitos que representa o número calculado;
    - O sinal (1 para positivo, -1 para negativo).
@@ -229,7 +237,7 @@ A função dividirBigNumbers é projetada para realizar a divisão de dois núme
    - A função começa verificando se o divisor é zero;
    - Se o divisor for zero (ou seja, se o primeiro dígito do divisor for 0 ou se a lista estiver vazia), a função imprime uma mensagem de erro e retorna NULL para indicar que a divisão não pode ser realizada.
 
-3. **Criação das Estruturas para o Quociente e Resto
+3. **Criação das Estruturas para o Quociente e Resto**
    - `BigNumberStruct* quociente`: Uma nova estrutura é criada para armazenar o quociente da divisão;
    - `BigNumberStruct* resto`: Uma nova estrutura é criada para armazenar o resto da divisão.
 
@@ -265,5 +273,88 @@ A função dividirBigNumbers é projetada para realizar a divisão de dois núme
 A função retorna BigNumberStruct* quociente, que contém:
     - A lista de dígitos representando o quociente da divisão;
     - O sinal do quociente, que será ajustado dependendo do resultado da divisão (caso o quociente seja zero, o sinal será ajustado como positivo).
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+### Função BigNumberStruct* restoBigNumber(BigNumberStruct* numero1, BigNumberStruct* divisor)
+A função restoBigNumber é projetada para realizar a devolutiva do resto de uma divisão de dois bignumbers:
+
+1. **Parâmetros de Entrada**
+   - `BigNumberStruct* dividendo`: O número do qual será calculado o resto (dividendo).
+   - `BigNumberStruct* divisor`: O número pelo qual numero1 será dividido (divisor).
+
+2. **Inicialização**
+   - Criar estrutura para o resultado do resto:
+     - Inicializa um novo BigNumberStruct chamado resto usando a função criarBigNumber;
+     - Este será o valor retornado ao final da função.  
+   - Criar uma cópia do dividendo:
+     - Cria um novo BigNumberStruct chamado dividendo usando criarBigNumber;
+     - Copia todos os dígitos de numero1 para dividendo:
+       - Itera pela lista de dígitos em numero1->head e adiciona cada dígito no final de dividendo usando adicionarNoFim.
+
+3. **Loop de subtração**
+   - A lógica aqui baseia-se em subtrair repetidamente o divisor do dividendo até que o dividendo se torne menor que o divisor.
+   - Verificar se o dividendo é maior ou igual ao divisor:
+     - A condição do while usa a função comparaBigNumbers para comparar os dois números;
+     - comparaBigNumbers retorna um valor >= 0 se o dividendo for maior ou igual ao divisor.
+   - Subtrair divisor do dividendo:
+     - Chama subtrairBigNumbers(dividendo, divisor) para calcular a diferença;
+     - Libera a memória do antigo dividendo para evitar vazamento de memória (liberaMemoria(dividendo));
+     - Atualiza o dividendo com o resultado da subtração.
+
+4. **Resto calculado**
+   - Restante no dividendo é o resto:
+    - O loop termina quando o dividendo for menor que o divisor;
+    - Copia os dígitos restantes no dividendo para o resto:
+     - Itera sobre a lista encadeada de dígitos em dividendo->head e adiciona cada dígito no final de resto usando adicionarNoFim.
+   - Liberar memória do dividendo:
+    - Após usar os valores restantes de dividendo, chama liberaMemoria(dividendo) para liberar a memória alocada.
+
+5. **Retorno do Resultado**
+   - Retorna o BigNumberStruct* resto, que contém o valor do resto da divisão de numero1 por divisor.
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+### Função BigNumberStruct* expRapida(BigNumberStruct* base, BigNumberStruct* exp)
+A função expRapida é projetada para realizar a exponenciação de dois bignumbers sendo b >= 0:
+
+1. **Parâmetros de Entrada**
+   - `BigNumberStruct* base`: O número base a ser elevado à potência.
+   - `BigNumberStruct* exp`: O expoente ao qual a base será elevada.
+
+2. **Caso base (condição inicial)**
+   - Verificar se o expoente é zero:
+     - Se o expoente (exp) for 0, a função retorna imediatamente 1;
+     - Cria um novo BigNumberStruct com o valor 1 usando criarBigNumberDeNumero(1).
+
+3. **Inicialização**
+   - Resultado inicializado como 1:
+    - Um BigNumberStruct chamado resultado é criado com o valor inicial 1.
+   - Copia os dígitos da base para baseAtual:
+     - Um novo BigNumberStruct chamado baseAtual é criado;
+     - Itera sobre os dígitos de base->head e os copia para baseAtual usando adicionarNoFim.
+   - Cria os BigNumbers auxiliares:
+     - zero é criado como BigNumberStruct com valor 0.
+     - dois é criado como BigNumberStruct com valor 2.
+
+4. **Loop principal**
+   - O loop continua enquanto o expoente (exp) for maior que 0:
+    - Verificar se o expoente é ímpar.
+    - Usa a função restoBigNumber(exp, dois) para obter o resto.
+    - Se o resto for 1 (expoente ímpar), multiplica o resultado atual pelo valor da base:
+      - Chama multiplicarBigNumbers para calcular resultado * baseAtual;
+      - Libera a memória do resultado antigo e atualiza-o com o novo valor.
+   - Atualizar baseAtual:
+    - Calcula o quadrado da base atual;
+    - Usa multiplicarBigNumbers(baseAtual, baseAtual) para calcular baseAtual^2;
+    - Libera a memória da base antiga e atualiza baseAtual com o novo valor.
+   - Atualizar exp:
+     - Divide o expoente por 2;
+     - Usa dividirBigNumbers(exp, dois) para calcular exp / 2;
+     - Libera a memória do expoente antigo e atualiza exp com o novo valor.
+   - Libera a memória do resto calculado.
+
+6. **Retorno do Resultado**
+   - Libera a memória de baseAtual, zero, e dois e Retorna o BigNumberStruct* resultado, que contém o valor calculado de base^exp.
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
