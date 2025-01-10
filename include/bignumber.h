@@ -44,5 +44,9 @@ BigNumberStruct* multiplicarBigNumbers(BigNumberStruct* num1, BigNumberStruct* n
 BigNumberStruct* dividirBigNumbers(BigNumberStruct* dividendo, BigNumberStruct* divisor); //Função para dividir dois BigNumberStruct com resultado inteiro;
 BigNumberStruct* restoBigNumber(BigNumberStruct* numero1, BigNumberStruct* divisor);//Função para calcular o resto da divisão;
 BigNumberStruct* expRapida(BigNumberStruct* base, BigNumberStruct* exp);//Função para calcular exponenciação rapida
+void dividirBigNumber(BigNumberStruct* numero, BigNumberStruct** parteAlta, BigNumberStruct** parteBaixa, int indiceDivisao);
+BigNumberStruct* deslocarBigNumber(BigNumberStruct* numero, int quantidade);
+BigNumberStruct* ajustarComprimento(BigNumberStruct* numero, int novoComprimento);
+BigNumberStruct* multiplicarKaratsuba(BigNumberStruct* num1, BigNumberStruct* num2);
 
 #endif

@@ -387,7 +387,7 @@ BigNumberStruct* executarOperacao(char operacao, BigNumberStruct* numero1, BigNu
             resultado = subtrairBigNumbers(numero2, numero1);
         }
     }
-    if (operacao == '*') {
+    if (operacao == '@') {
         if (numero1->sinal == 1 && numero2->sinal == 1) {
             // a e b positivo
             resultado = multiplicarBigNumbers(reverterBigNumber(numero1), reverterBigNumber(numero2));
@@ -406,6 +406,26 @@ BigNumberStruct* executarOperacao(char operacao, BigNumberStruct* numero1, BigNu
             numero1->sinal = 1; 
             numero2->sinal = 1; 
             resultado = multiplicarBigNumbers(reverterBigNumber(numero1), reverterBigNumber(numero2));
+        }
+    }
+	if (operacao == '*') {
+        if (numero1->sinal == 1 && numero2->sinal == 1) {
+            // a e b positivo
+            resultado = multiplicarKaratsuba(numero1, numero2);
+        } else if (numero1->sinal == 1 && numero2->sinal == -1) {
+            // a positivo e b com negativos
+            numero2->sinal = 1; 
+            resultado = multiplicarKaratsuba(numero1, numero2);
+            resultado->sinal = -1;
+        } else if (numero1->sinal == -1 && numero2->sinal == 1) {
+            // a negativo e b positivo
+            numero1->sinal = 1; 
+            resultado = multiplicarKaratsuba(numero1, numero2);
+            resultado->sinal = -1;
+        } else {
+            //com ambos numeros negativos, vira positivo 
+            resultado = multiplicarKaratsuba(numero1, numero2);
+			resultado->sinal = 1;
         }
     }
 	if(operacao == '/'){
@@ -856,25 +876,127 @@ BigNumberStruct* expRapida(BigNumberStruct* base, BigNumberStruct* exp) {
 }
 
 
+void dividirBigNumber(BigNumberStruct* numero, BigNumberStruct** parteAlta, BigNumberStruct** parteBaixa, int indiceDivisao) {
+    BigNumber* atual = numero->head;
+    int contagem = 0;
+
+    *parteAlta = criarBigNumber();
+    *parteBaixa = criarBigNumber();
+
+    // Itera pelos elementos da lista original e divide nas duas partes
+    while (atual != NULL) {
+        if (contagem < indiceDivisao) {
+            // Adiciona ao número alto
+            adicionarNoFim(*parteAlta, atual->digito);
+        } else {
+            // Adiciona ao número baixo
+            adicionarNoFim(*parteBaixa, atual->digito);
+        }
+        contagem++;
+        atual = atual->next;
+    }
+
+    // Remover zeros à esquerda das partes
+    removerZeros(*parteAlta);
+    removerZeros(*parteBaixa);
+}
 
 
+BigNumberStruct* deslocarBigNumber(BigNumberStruct* numero, int m) {
+    BigNumberStruct* resultado = criarBigNumber();
+
+    BigNumber* atual = numero->head;
+    while (atual != NULL) {
+        adicionarNoFim(resultado, atual->digito);  // Adicionar dígitos originais ao resultado
+        atual = atual->next;
+    }
+
+    // Adicionar os zeros à direita após os dígitos originais
+    for (int i = 0; i < m; i++) {
+        adicionarNoFim(resultado, 0);  // Adiciona um zero a cada deslocamento
+    }
+
+    return resultado;
+}
+
+// Função para padronizar o tamanho dos números (preenchendo com zeros à esquerda)
+BigNumberStruct* padronizarTamanho(BigNumberStruct* numero, int tamanho) {
+    BigNumberStruct* numeroPadronizado = criarBigNumber();
+    int len = contarElementos(numero);
+
+    // Adiciona zeros à esquerda até o número ter o tamanho correto
+    for (int i = 0; i < (tamanho - len); i++) {
+        adicionarNoFim(numeroPadronizado, 0);  // Adiciona zero à esquerda
+    }
+
+    // Adiciona os dígitos do número original
+    BigNumber* atual = numero->head;
+    while (atual != NULL) {
+        adicionarNoFim(numeroPadronizado, atual->digito);
+        atual = atual->next;
+    }
+
+    return numeroPadronizado;
+}
+
+BigNumberStruct* multiplicarKaratsuba(BigNumberStruct* num1, BigNumberStruct* num2) {
+    removerZeros(num1);  // Remover zeros à esquerda de num1
+    removerZeros(num2);  // Remover zeros à esquerda de num2
+
+    int len1 = contarElementos(num1);
+    int len2 = contarElementos(num2);
+
+	int maxLen = (len1 > len2) ? len1 : len2;
+
+	num1 = padronizarTamanho(num1, maxLen);
+    num2 = padronizarTamanho(num2, maxLen);
+
+    // Agora num1 e num2 têm o mesmo tamanho, podemos prosseguir com a multiplicação
+    if (len1 == 1 || len2 == 1) {
+        return multiplicarBigNumbers(reverterBigNumber(num1), reverterBigNumber(num2));
+    }
+
+    int m = (maxLen + 1) / 2;
+
+    BigNumberStruct *a0, *a1, *b0, *b1;
+    
+	dividirBigNumber(num1, &a1, &a0, m);
+    dividirBigNumber(num2, &b1, &b0, m);
+
+	BigNumberStruct *z0 = multiplicarBigNumbers(reverterBigNumber(a0), reverterBigNumber(b0));
+    BigNumberStruct *z2 = multiplicarBigNumbers(reverterBigNumber(a1), reverterBigNumber(b1));
 
 
+    BigNumberStruct *sumA = somaBigNumber(a0, a1);
+    BigNumberStruct *sumB = somaBigNumber(b0, b1);
+
+    BigNumberStruct *z1 = multiplicarBigNumbers(reverterBigNumber(sumA), reverterBigNumber(sumB));
 
 
+    BigNumberStruct *temp = somaBigNumber(z0, z2);
 
+    z1 = subtrairBigNumbers(z1, temp);
 
+    BigNumberStruct *z2Shifted = deslocarBigNumber(z2, 2 * m);
+    BigNumberStruct *z1Shifted = deslocarBigNumber(z1, m);
 
+    BigNumberStruct *result = somaBigNumber(z2Shifted, z1Shifted);
+    result = somaBigNumber(result, z0);
 
+    removerZeros(result);  // Remover zeros à esquerda do resultado final
 
+    liberaMemoria(a0);
+    liberaMemoria(a1);
+    liberaMemoria(b0);
+    liberaMemoria(b1);
+    liberaMemoria(z0);
+    liberaMemoria(z1);
+    liberaMemoria(z2);
+    liberaMemoria(temp);
+    liberaMemoria(z2Shifted);
+    liberaMemoria(z1Shifted);
+    liberaMemoria(sumA);
+    liberaMemoria(sumB);
 
-
-
-
-
-
-
-
-
-
-
+    return result;
+}
