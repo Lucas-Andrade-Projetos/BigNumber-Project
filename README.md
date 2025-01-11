@@ -5,8 +5,10 @@
 *Todo o trabalho foi feito por mim, então todas as divisões como testes, organização e desenvolvimento foram realizadas por uma pessoa.*
 
 ## Descrição
-O **BigNumber Project** é uma implementação de um tipo de dado que representa números inteiros extremamente grandes, utilizando uma lista duplamente encadeada para armazenar seus dígitos. O objetivo do projeto é criar uma estrutura de dados capaz de realizar operações aritméticas básicas (+, -, ×, ÷) em números inteiros de qualquer tamanho, sem perder precisão e alguns extras como resto da divisão e exponenciação(%, ^).  
+O **BigNumber Project** é uma implementação de um tipo de dado que representa números inteiros extremamente grandes, utilizando uma lista duplamente encadeada para armazenar seus dígitos. O objetivo do projeto é criar uma estrutura de dados capaz de realizar operações aritméticas básicas (+, -, *, ÷) em números inteiros de qualquer tamanho, sem perder precisão e alguns extras como resto da divisão e exponenciação(%, ^).  
 Este projeto foi desenvolvido para lidar com números tão grandes quanto a memória do computador permitir, com foco em aplicabilidade em áreas como criptografia, simulações de grandes dados e outros campos que necessitam de manipulação precisa de grandes números inteiros.
+
+Fora isso, a multiplicação por padrão está definida por método de karatsuba, entretanto se o operador for trocado de "*" para "@" o programa realiza a multiplicação pelo método ocidental, ou seja as duas formas estão em funcionamento.
 
 ## Explicação da Organização do Código
 O código foi organizado em módulos separados para garantir a clareza e manutenção eficiente:
@@ -24,10 +26,10 @@ O funcionamento se resume à entrada dos dados, sendo dois BigNumbers e uma oper
 ## Guia de funções e funcionamento:
 
 ### Função `BigNumberStruct* executarOperacao(char operacao, BigNumberStruct* numero1, BigNumberStruct* numero2)`
-A função `executarOperacao` é projetada para realizar operações matemáticas ( + , - , * , /, %, ^) entre dois números grandes (`BigNumberStruct`) que podem incluir valores positivos ou negativos. Aqui está uma explicação passo a passo do fluxo da função:
+A função `executarOperacao` é projetada para realizar operações matemáticas ( + , - , * , /, %, ^, @) entre dois números grandes (`BigNumberStruct`) que podem incluir valores positivos ou negativos. Aqui está uma explicação passo a passo do fluxo da função:
 
 1. **Parâmetros de entrada**
-   - `char operacao`: Indica qual operação matemática será executada ( + , - , * , /, %, ^).
+   - `char operacao`: Indica qual operação matemática será executada ( + , - , * , /, %, ^, @).
    - `BigNumberStruct* numero1`: Primeiro número grande.
    - `BigNumberStruct* numero2`: Segundo número grande.
 
@@ -46,12 +48,18 @@ A função `executarOperacao` é projetada para realizar operações matemática
    - **numero1 negativo, numero2 positivo**: Muda o sinal de `numero1` para positivo temporariamente. Soma os números e define o resultado como negativo.
    - **Ambos negativos**: Ambos os números são convertidos para positivos temporariamente. Calcula a subtração invertendo os parâmetros (numero2 - numero1).
 
-5. **Operação de multiplicação ( * )**
+5. **Operação de multiplicação normal ( @ )**
    - **Ambos positivos**: Chama `multiplicarBigNumbers` diretamente, mas reverte os números antes da operação (`reverterBigNumber`).
    - **numero1 positivo, numero2 negativo**: Converte `numero2` para positivo temporariamente. Realiza a multiplicação. Define o sinal do resultado como negativo.
    - **numero1 negativo, numero2 positivo**: Converte `numero1` para positivo temporariamente. Realiza a multiplicação. Define o sinal do resultado como negativo.
    - **Ambos negativos**: Converte ambos para positivos temporariamente. Realiza a multiplicação. O resultado permanece positivo.
-
+   - 
+5. **Operação de multiplicação por Karatsuba ( * )**
+   - **Ambos positivos**: Chama `multiplicarKaratsuba` diretamente.
+   - **numero1 positivo, numero2 negativo**: Converte `numero2` para positivo temporariamente. Realiza a multiplicação. Define o sinal do resultado como negativo.
+   - **numero1 negativo, numero2 positivo**: Converte `numero1` para positivo temporariamente. Realiza a multiplicação. Define o sinal do resultado como negativo.
+   - **Ambos negativos**: Converte ambos para positivos temporariamente. Realiza a multiplicação. O resultado permanece positivo.
+   - 
 6. **Operação de divisão ( / )**
    - **Ambos positivos**: Chama `dividirBigNumbers` diretamente.
    - **numero1 positivo, numero2 negativo**: Muda o sinal de `numero2` para positivo temporariamente. Realiza a divisão. Se o resultado não for zero (verificado pelo primeiro dígito da lista encadeada), define o sinal como negativo.
@@ -356,5 +364,55 @@ A função expRapida é projetada para realizar a exponenciação de dois bignum
 
 6. **Retorno do Resultado**
    - Libera a memória de baseAtual, zero, e dois e Retorna o BigNumberStruct* resultado, que contém o valor calculado de base^exp.
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+### Função BigNumberStruct* multiplicarKaratsuba(BigNumberStruct* num1, BigNumberStruct* num2)
+A função multiplicarKaratsuba realiza a multiplicação de dois números grandes representados por listas encadeadas usando o algoritmo de Karatsuba, que é um método eficiente para multiplicação de grandes números. 
+
+1. **Parâmetros de Entrada**
+   - `BigNumberStruct num1*`: O primeiro número a ser multiplicado.
+   - `BigNumberStruct num2*`: O segundo número a ser multiplicado.
+
+2. **Condição de base (multiplicação direta para números pequenos):**
+   - Se qualquer um dos números tiver apenas um dígito, a multiplicação é feita diretamente usando a função multiplicarBigNumbers, e o resultado é retornado imediatamente.
+
+3. **Inicialização**
+   - Antes de iniciar a multiplicação, é realizado o processo de remoção dos zeros à esquerda dos números num1 e num2, garantindo que não haja cálculos desnecessários e que os números estejam no formato adequado.
+   - Verificação do tamanho dos números:
+     - O número de dígitos de num1 e num2 é calculado utilizando a função contarElementos();
+     - O maior tamanho entre os dois números é escolhido para garantir que ambos tenham o mesmo número de dígitos durante o processo de multiplicação.
+   - Padronização do tamanho dos números:
+     - Os números são ajustados para garantir que ambos tenham o mesmo número de dígitos, usando a função padronizarTamanho(num1, tamanhoMaximo).
+
+4. **Divisão Recursiva dos Números**
+   - Cálculo do meio (índice de divisão):
+    - O índice medio é calculado para dividir os números ao meio.
+   - Divisão dos números:
+    - O número num1 é dividido em duas partes: num1_0 (parte inferior) e num1_1 (parte superior);
+    - O número num2 é igualmente dividido em duas partes: num2_0 (parte inferior) e num2_1 (parte superior).
+   - Cálculos Intermediários (Multiplicações Recursivas):
+    - Primeira multiplicação (z0):
+     - A primeira multiplicação é feita entre as partes inferiores dos números, num1_0 e num2_0. O resultado é armazenado em z0;
+    - Segunda multiplicação (z2):
+     - A segunda multiplicação é feita entre as partes superiores dos números, num1_1 e num2_1. O resultado é armazenado em z2.
+    - Terceira multiplicação (z1):
+     - Para calcular a terceira multiplicação, são somadas as partes superiores e inferiores dos números;
+     - somaA = num1_0 + num1_1;
+     - somaB = num2_0 + num2_1;
+     - Então, a multiplicação entre essas somas é feita e o resultado é armazenado em z1.
+   - Ajuste e Combinação dos Resultados:
+    - Subtração do valor de z1:
+     - A partir de z1, é subtraída a soma de z0 e z2 para corrigir o cálculo. Isso é feito pela operação z1 = z1 - (z0 + z2).
+    - Deslocamento das partes:
+     - As partes z2 e z1 precisam ser deslocadas para as ordens corretas. Dependendo do tamanho do número (par ou ímpar), os deslocamentos são feitos da seguinte maneira;
+     - Se o número tem um número par de dígitos, z2 é deslocado duas vezes o valor de medio e z1 é deslocado uma vez o valor de medio;
+     - Se o número tem um número ímpar de dígitos, o deslocamento de z2 é feito com 2 * (medio - 1) e o deslocamento de z1 é feito com medio - 1.
+   - Cálculo Final:
+    - O resultado final é obtido somando z2elevada, z1elevada e z0 para formar o valor final da multiplicação.
+    - Após o cálculo final, a memória alocada para as variáveis intermediárias (num1_0, num1_1, num2_0, num2_1, z0, z1, z2, temp, z2elevada, z1elevada, somaA, somaB) é liberada para evitar vazamentos de memória.
+    
+5. **Retorno do Resultado**
+   - O resultado final da multiplicação é retornado em um BigNumberStruct* que contém o valor calculado de num1 * num2.
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
