@@ -31,6 +31,9 @@ int isImpar(BigNumberStruct* numero); //Função que verifica se o bignumber é 
 void removerInicio(BigNumberStruct* numero); //Função para remover numeros no inicio;
 void removerZeros(BigNumberStruct* numero); //Função que remove os zeros a esquerda;
 BigNumberStruct* reverterBigNumber(BigNumberStruct* numero); //Função que reverte a lista(Usada na multiplicação);
+void dividirBigNumber(BigNumberStruct* numero, BigNumberStruct** parteAlta, BigNumberStruct** parteBaixa, int indiceDivisao); //Função divide o bignumber em sub-bignumbers de acordo com o indice da divisão(usado extritamente no metodo do karatsuba)
+BigNumberStruct* deslocarBigNumber(BigNumberStruct* numero, int m); //Função que faz as exponenciações de 10 no metodo do karatsuba (usado extritamente no metodo do karatsuba)
+BigNumberStruct* padronizarTamanho(BigNumberStruct* numero, int tamanho); //Função para padronizar o tamanho dos números (preenchendo com zeros à esquerda) - (usado extritamente no metodo do karatsuba)
 void imprimirNumero(BigNumberStruct* numero); //Função para imprimir a lista encadeada;
 void liberaMemoria(BigNumberStruct* numero); //Função para liberar a memória da lista.
 
@@ -44,9 +47,6 @@ BigNumberStruct* multiplicarBigNumbers(BigNumberStruct* num1, BigNumberStruct* n
 BigNumberStruct* dividirBigNumbers(BigNumberStruct* dividendo, BigNumberStruct* divisor); //Função para dividir dois BigNumberStruct com resultado inteiro;
 BigNumberStruct* restoBigNumber(BigNumberStruct* numero1, BigNumberStruct* divisor);//Função para calcular o resto da divisão;
 BigNumberStruct* expRapida(BigNumberStruct* base, BigNumberStruct* exp);//Função para calcular exponenciação rapida
-void dividirBigNumber(BigNumberStruct* numero, BigNumberStruct** parteAlta, BigNumberStruct** parteBaixa, int indiceDivisao);
-BigNumberStruct* deslocarBigNumber(BigNumberStruct* numero, int quantidade);
-BigNumberStruct* ajustarComprimento(BigNumberStruct* numero, int novoComprimento);
-BigNumberStruct* multiplicarKaratsuba(BigNumberStruct* num1, BigNumberStruct* num2);
+BigNumberStruct* multiplicarKaratsuba(BigNumberStruct* num1, BigNumberStruct* num2); //Função para multiplicar dois BigNumberStruct por karatsuba;
 
 #endif
